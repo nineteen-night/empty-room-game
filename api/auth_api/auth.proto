@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package auth.service.v1;
+option go_package = "github.com/nineteen-night/empty-room-game/internal/auth/pb/auth_api";
+
+import "models/auth_model.proto";
+import "google/api/annotations.proto";
+
+service AuthService {
+    // Пользователи
+    rpc GetUsersByIDs (GetUsersByIDsRequest) returns (GetUsersByIDsResponse) {
+        option (google.api.http) = {
+            post: "/users/get-by-ids"
+            body: "*"
+        };
+    }
+
+    rpc UpsertUsers (UpsertUsersRequest) returns (UpsertUsersResponse) {
+        option (google.api.http) = {
+            post: "/users/upsert"
+            body: "*"
+        };
+    }
+
+    // Партнёрства
+    rpc GetPartnershipsByIDs (GetPartnershipsByIDsRequest) returns (GetPartnershipsByIDsResponse) {
+        option (google.api.http) = {
+            post: "/partnerships/get-by-ids"
+            body: "*"
+        };
+    }
+
+    rpc UpsertPartnerships (UpsertPartnershipsRequest) returns (UpsertPartnershipsResponse) {
+        option (google.api.http) = {
+            post: "/partnerships/upsert"
+            body: "*"
+        };
+    }
+}
+
+// Запросы для пользователей
+message GetUsersByIDsRequest {
+    repeated uint64 ids = 1;
+}
+
+message GetUsersByIDsResponse {
+    repeated auth.models.v1.UserModel users = 1;
+}
+
+message UpsertUsersRequest {
+    repeated auth.models.v1.UserUpsertModel users = 1;
+}
+
+message UpsertUsersResponse {
+}
+
+// Запросы для партнёрств
+message GetPartnershipsByIDsRequest {
+    repeated uint64 ids = 1;
+}
+
+message GetPartnershipsByIDsResponse {
+    repeated auth.models.v1.PartnershipModel partnerships = 1;
+}
+
+message UpsertPartnershipsRequest {
+    repeated auth.models.v1.PartnershipUpsertModel partnerships = 1;
+}
+
+message UpsertPartnershipsResponse {
+}

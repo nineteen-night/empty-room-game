@@ -1,0 +1,349 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "game_api/game.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "GameService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/game-sessions/get-by-ids": {
+      "post": {
+        "summary": "Игровые сессии",
+        "operationId": "GameService_GetGameSessionsByIDs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGameSessionsByIDsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetGameSessionsByIDsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/game-sessions/upsert": {
+      "post": {
+        "operationId": "GameService_UpsertGameSessions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertGameSessionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertGameSessionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/game-states/get-by-ids": {
+      "post": {
+        "summary": "Состояния игр",
+        "operationId": "GameService_GetGameStatesByIDs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetGameStatesByIDsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetGameStatesByIDsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    },
+    "/game-states/upsert": {
+      "post": {
+        "operationId": "GameService_UpsertGameStates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertGameStatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertGameStatesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GameService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GameSessionModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "partnershipId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currentRoom": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "title": "\"active\", \"paused\", \"completed\""
+        },
+        "currentPlayerId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1GameSessionUpsertModel": {
+      "type": "object",
+      "properties": {
+        "partnershipId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "currentRoom": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "currentPlayerId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1GameStateModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "gameSessionId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "inventory": {
+          "type": "string",
+          "title": "JSON"
+        },
+        "puzzlesSolved": {
+          "type": "string",
+          "title": "JSON"
+        },
+        "currentRoomId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1GameStateUpsertModel": {
+      "type": "object",
+      "properties": {
+        "gameSessionId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "inventory": {
+          "type": "string",
+          "title": "JSON"
+        },
+        "puzzlesSolved": {
+          "type": "string",
+          "title": "JSON"
+        },
+        "currentRoomId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1GetGameSessionsByIDsRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      },
+      "title": "Запросы для игровых сессий"
+    },
+    "v1GetGameSessionsByIDsResponse": {
+      "type": "object",
+      "properties": {
+        "gameSessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GameSessionModel"
+          }
+        }
+      }
+    },
+    "v1GetGameStatesByIDsRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      },
+      "title": "Запросы для состояний игр"
+    },
+    "v1GetGameStatesByIDsResponse": {
+      "type": "object",
+      "properties": {
+        "gameStates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GameStateModel"
+          }
+        }
+      }
+    },
+    "v1UpsertGameSessionsRequest": {
+      "type": "object",
+      "properties": {
+        "gameSessions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GameSessionUpsertModel"
+          }
+        }
+      }
+    },
+    "v1UpsertGameSessionsResponse": {
+      "type": "object"
+    },
+    "v1UpsertGameStatesRequest": {
+      "type": "object",
+      "properties": {
+        "gameStates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1GameStateUpsertModel"
+          }
+        }
+      }
+    },
+    "v1UpsertGameStatesResponse": {
+      "type": "object"
+    }
+  }
+}

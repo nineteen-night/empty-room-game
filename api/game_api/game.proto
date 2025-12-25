@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package game.service.v1;
+option go_package = "github.com/nineteen-night/empty-room-game/internal/game/pb/game_api";
+
+import "models/game_model.proto";
+import "google/api/annotations.proto";
+
+service GameService {
+    // Игровые сессии
+    rpc GetGameSessionsByIDs (GetGameSessionsByIDsRequest) returns (GetGameSessionsByIDsResponse) {
+        option (google.api.http) = {
+            post: "/game-sessions/get-by-ids"
+            body: "*"
+        };
+    }
+
+    rpc UpsertGameSessions (UpsertGameSessionsRequest) returns (UpsertGameSessionsResponse) {
+        option (google.api.http) = {
+            post: "/game-sessions/upsert"
+            body: "*"
+        };
+    }
+    
+    // Состояния игр
+    rpc GetGameStatesByIDs (GetGameStatesByIDsRequest) returns (GetGameStatesByIDsResponse) {
+        option (google.api.http) = {
+            post: "/game-states/get-by-ids"
+            body: "*"
+        };
+    }
+
+    rpc UpsertGameStates (UpsertGameStatesRequest) returns (UpsertGameStatesResponse) {
+        option (google.api.http) = {
+            post: "/game-states/upsert"
+            body: "*"
+        };
+    }
+}
+
+// Запросы для игровых сессий
+message GetGameSessionsByIDsRequest {
+    repeated uint64 ids = 1;
+}
+
+message GetGameSessionsByIDsResponse {
+    repeated game.models.v1.GameSessionModel game_sessions = 1;
+}
+
+message UpsertGameSessionsRequest {
+    repeated game.models.v1.GameSessionUpsertModel game_sessions = 1;
+}
+
+message UpsertGameSessionsResponse {
+}
+
+// Запросы для состояний игр
+message GetGameStatesByIDsRequest {
+    repeated uint64 ids = 1;
+}
+
+message GetGameStatesByIDsResponse {
+    repeated game.models.v1.GameStateModel game_states = 1;
+}
+
+message UpsertGameStatesRequest {
+    repeated game.models.v1.GameStateUpsertModel game_states = 1;
+}
+
+message UpsertGameStatesResponse {
+}

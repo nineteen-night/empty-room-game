@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # Auth Service PostgreSQL
+  auth-postgres:
+    image: postgres:15-alpine
+    container_name: auth-postgres
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+    networks:
+      - empty-room-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Game Service PostgreSQL
+  game-postgres:
+    image: postgres:15-alpine
+    container_name: game-postgres
+    environment:
+      POSTGRES_USER: game_user
+      POSTGRES_PASSWORD: game_password
+      POSTGRES_DB: game_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - game-postgres-data:/var/lib/postgresql/data
+    networks:
+      - empty-room-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U game_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zookeeper:
+    image: zookeeper:3.9
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+    networks:
+      - empty-room-net
+
+  kafka:
+    image: wurstmeister/kafka:2.13-2.8.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9094,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9094,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "partnership_created:1:1"
+    depends_on:
+      - zookeeper
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - empty-room-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8082:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka:9094
+      - KAFKA_CLUSTERS_0_ZOOKEEPER_CONNECT=zookeeper:2181
+    networks:
+      - empty-room-net
+
+networks:
+  empty-room-net:
+    driver: bridge
+
+volumes:
+  auth-postgres-data:
+  game-postgres-data:

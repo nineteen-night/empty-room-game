@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package auth.models.v1;
+option go_package = "github.com/nineteen-night/empty-room-game/internal/auth/pb/models";
+
+message UserModel {
+    uint64 id = 1;
+    string username = 2;
+    string email = 3;
+    string password_hash = 4;
+}
+
+message UserUpsertModel {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message PartnershipModel {
+    uint64 id = 1;
+    uint64 player1_id = 2;
+    uint64 player2_id = 3;
+    string status = 4;
+}
+
+message PartnershipUpsertModel {
+    uint64 player1_id = 1;
+    uint64 player2_id = 2;
+}

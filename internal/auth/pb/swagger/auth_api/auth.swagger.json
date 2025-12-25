@@ -1,0 +1,325 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "auth_api/auth.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AuthService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/partnerships/get-by-ids": {
+      "post": {
+        "summary": "Партнёрства",
+        "operationId": "AuthService_GetPartnershipsByIDs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPartnershipsByIDsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetPartnershipsByIDsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/partnerships/upsert": {
+      "post": {
+        "operationId": "AuthService_UpsertPartnerships",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertPartnershipsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertPartnershipsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/get-by-ids": {
+      "post": {
+        "summary": "Пользователи",
+        "operationId": "AuthService_GetUsersByIDs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersByIDsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersByIDsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/users/upsert": {
+      "post": {
+        "operationId": "AuthService_UpsertUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertUsersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1GetPartnershipsByIDsRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      },
+      "title": "Запросы для партнёрств"
+    },
+    "v1GetPartnershipsByIDsResponse": {
+      "type": "object",
+      "properties": {
+        "partnerships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PartnershipModel"
+          }
+        }
+      }
+    },
+    "v1GetUsersByIDsRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      },
+      "title": "Запросы для пользователей"
+    },
+    "v1GetUsersByIDsResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserModel"
+          }
+        }
+      }
+    },
+    "v1PartnershipModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "player1Id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "player2Id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "v1PartnershipUpsertModel": {
+      "type": "object",
+      "properties": {
+        "player1Id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "player2Id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "v1UpsertPartnershipsRequest": {
+      "type": "object",
+      "properties": {
+        "partnerships": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PartnershipUpsertModel"
+          }
+        }
+      }
+    },
+    "v1UpsertPartnershipsResponse": {
+      "type": "object"
+    },
+    "v1UpsertUsersRequest": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1UserUpsertModel"
+          }
+        }
+      }
+    },
+    "v1UpsertUsersResponse": {
+      "type": "object"
+    },
+    "v1UserModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "passwordHash": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UserUpsertModel": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

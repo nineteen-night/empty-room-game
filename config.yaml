@@ -1,0 +1,36 @@
+database:
+  auth_db:
+    host: "localhost"
+    port: 5432
+    username: "auth_user"
+    password: "auth_password"
+    name: "auth_db"
+    ssl_mode: "disable"
+  
+  game_db:
+    host: "localhost"
+    port: 5433
+    username: "game_user"
+    password: "game_password"
+    name: "game_db"
+    ssl_mode: "disable"
+
+kafka:
+  host: "localhost"
+  port: 9092
+  users_upsert_topic: "users_upsert"
+  partnerships_upsert_topic: "partnerships_upsert"
+  game_sessions_upsert_topic: "game_sessions_upsert" 
+  game_states_upsert_topic: "game_states_upsert" 
+
+AuthServiceSettings:
+  http_port: 8080
+  grpc_port: 50051
+  min_name_len: 3
+  max_name_len: 50
+
+GameServiceSettings:
+  http_port: 8081
+  grpc_port: 50052
+  min_name_len: 1
+  max_name_len: 100
