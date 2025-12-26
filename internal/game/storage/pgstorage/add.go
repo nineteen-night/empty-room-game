@@ -1,82 +1,85 @@
 package pgstorage
 
 import (
-    "context"
+	"context"
+	"fmt"
 
-    "github.com/nineteen-night/empty-room-game/internal/game/models"
-    "github.com/Masterminds/squirrel"
-    "github.com/pkg/errors"
-    "github.com/samber/lo"
+	"github.com/Masterminds/squirrel"
+	"github.com/pkg/errors"
 )
 
-func (storage *PGstorage) UpsertGameSessions(ctx context.Context, domainSessions []*models.GameSession) error {
-    if len(domainSessions) == 0 {
-        return nil
-    }
+func (s *PGStorage) CreateGameSession(ctx context.Context, partnershipID, user1ID, user2ID string) error {
+	query := squirrel.Insert(gameSessionsTable).
+		Columns(partnershipIDColumn, user1IDColumn, user2IDColumn, currentRoomColumn).
+		Values(partnershipID, user1ID, user2ID, 1).
+		PlaceholderFormat(squirrel.Dollar)
 
-    query := storage.upsertGameSessionsQuery(domainSessions)
-    queryText, args, err := query.ToSql()
-    if err != nil {
-        return errors.Wrap(err, "generate query error")
-    }
-    
-    _, err = storage.db.Exec(ctx, queryText, args...)
-    return errors.Wrap(err, "execute query error")
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return errors.Wrap(err, "generate query error")
+	}
+
+	_, err = s.db.Exec(ctx, queryText, args...)
+	if err != nil {
+		return errors.Wrap(err, "execute query error")
+	}
+
+	return nil
 }
 
-func (storage *PGstorage) upsertGameSessionsQuery(domainSessions []*models.GameSession) squirrel.Sqlizer {
-    sessions := lo.Map(domainSessions, func(session *models.GameSession, _ int) *GameSession {
-        return &GameSession{
-            PartnershipID:   session.PartnershipID,
-            CurrentRoom:     session.CurrentRoom,
-            Status:          session.Status,
-            CurrentPlayerID: session.CurrentPlayerID,
-        }
-    })
+func (s *PGStorage) DeleteGameSession(ctx context.Context, partnershipID string) error {
+	query := squirrel.Delete(gameSessionsTable).
+		Where(squirrel.Eq{partnershipIDColumn: partnershipID}).
+		PlaceholderFormat(squirrel.Dollar)
 
-    q := squirrel.Insert(gameSessionsTable).
-        Columns(partnershipIDColumn, currentRoomColumn, statusColumn, currentPlayerIDColumn).
-        PlaceholderFormat(squirrel.Dollar).
-        Suffix("ON CONFLICT (partnership_id) DO UPDATE SET current_room = EXCLUDED.current_room, status = EXCLUDED.status, current_player_id = EXCLUDED.current_player_id RETURNING id")
-    
-    for _, session := range sessions {
-        q = q.Values(session.PartnershipID, session.CurrentRoom, session.Status, session.CurrentPlayerID)
-    }
-    return q
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return errors.Wrap(err, "generate query error")
+	}
+
+	result, err := s.db.Exec(ctx, queryText, args...)
+	if err != nil {
+		return errors.Wrap(err, "execute query error")
+	}
+
+	if result.RowsAffected() == 0 {
+		return errors.New("game session not found")
+	}
+
+	return nil
 }
 
-func (storage *PGstorage) UpsertGameStates(ctx context.Context, domainStates []*models.GameState) error {
-    if len(domainStates) == 0 {
-        return nil
-    }
+func (s *PGStorage) UpdateCurrentRoom(ctx context.Context, partnershipID string, newRoom int32) error {
+	query := squirrel.Update(gameSessionsTable).
+		Set(currentRoomColumn, newRoom).
+		Where(squirrel.Eq{partnershipIDColumn: partnershipID}).
+		PlaceholderFormat(squirrel.Dollar)
 
-    query := storage.upsertGameStatesQuery(domainStates)
-    queryText, args, err := query.ToSql()
-    if err != nil {
-        return errors.Wrap(err, "generate query error")
-    }
-    
-    _, err = storage.db.Exec(ctx, queryText, args...)
-    return errors.Wrap(err, "execute query error")
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return errors.Wrap(err, "generate query error")
+	}
+
+	result, err := s.db.Exec(ctx, queryText, args...)
+	if err != nil {
+		return errors.Wrap(err, "execute query error")
+	}
+
+	if result.RowsAffected() == 0 {
+		return errors.New("game session not found")
+	}
+
+	return nil
 }
 
-func (storage *PGstorage) upsertGameStatesQuery(domainStates []*models.GameState) squirrel.Sqlizer {
-    states := lo.Map(domainStates, func(state *models.GameState, _ int) *GameState {
-        return &GameState{
-            GameSessionID: state.GameSessionID,
-            Inventory:     state.Inventory,
-            PuzzlesSolved: state.PuzzlesSolved,
-            CurrentRoomID: state.CurrentRoomID,
-        }
-    })
+func (s *PGStorage) GetMaxRoomNumber(ctx context.Context) (int32, error) {
+	query := fmt.Sprintf("SELECT MAX(%s) FROM %s", roomNumberColumn, roomsTable)
+	
+	var maxRoom int32
+	err := s.db.QueryRow(ctx, query).Scan(&maxRoom)
+	if err != nil {
+		return 0, errors.Wrap(err, "query error")
+	}
 
-    q := squirrel.Insert(gameStatesTable).
-        Columns(gameSessionIDColumn2, inventoryColumn, puzzlesSolvedColumn, currentRoomIDColumn).
-        PlaceholderFormat(squirrel.Dollar).
-        Suffix("ON CONFLICT (game_session_id) DO UPDATE SET inventory = EXCLUDED.inventory, puzzles_solved = EXCLUDED.puzzles_solved, current_room_id = EXCLUDED.current_room_id RETURNING id")
-    
-    for _, state := range states {
-        q = q.Values(state.GameSessionID, state.Inventory, state.PuzzlesSolved, state.CurrentRoomID)
-    }
-    return q
+	return maxRoom, nil
 }

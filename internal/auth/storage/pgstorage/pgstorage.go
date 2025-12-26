@@ -36,52 +36,46 @@ func NewPGStorage(connString string) (*PGstorage, error) {
 }
 
 func (s *PGstorage) initTables() error {
-	//users
 	usersSQL := fmt.Sprintf(`
 	CREATE TABLE IF NOT EXISTS %s (
-		%s SERIAL PRIMARY KEY,
+		%s UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 		%s VARCHAR(50) UNIQUE NOT NULL,
 		%s VARCHAR(100) UNIQUE NOT NULL,
 		%s VARCHAR(255) NOT NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	)`, usersTable, userIDColumn, usernameColumn, emailColumn, passwordHashColumn)
+		%s INTEGER DEFAULT 0 NOT NULL
+	)`, usersTable, userIDColumn, usernameColumn, emailColumn, 
+	   passwordHashColumn, maxRoomReachedColumn)
 	
 	_, err := s.db.Exec(context.Background(), usersSQL)
 	if err != nil {
 		return errors.Wrap(err, "создание таблицы users")
 	}
 
-	//partnerships
-	partnershipsSQL := fmt.Sprintf(`
-	CREATE TABLE IF NOT EXISTS %s (
-		%s SERIAL PRIMARY KEY,
-		%s BIGINT NOT NULL REFERENCES %s(%s),
-		%s BIGINT NOT NULL REFERENCES %s(%s),
-		%s VARCHAR(20) DEFAULT 'pending' CHECK (%s IN ('pending', 'active', 'completed')),
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		UNIQUE(%s, %s)
-	)`, partnershipsTable, partnershipIDColumn, 
-	   player1IDColumn, usersTable, userIDColumn,
-	   player2IDColumn, usersTable, userIDColumn,
-	   statusColumn, statusColumn,
-	   player1IDColumn, player2IDColumn)
-	
-	_, err = s.db.Exec(context.Background(), partnershipsSQL)
-	if err != nil {
-		return errors.Wrap(err, "создание таблицы partnerships")
-	}
+    partnershipsSQL := fmt.Sprintf(`
+    CREATE TABLE IF NOT EXISTS %s (
+        %s UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        %s UUID NOT NULL REFERENCES %s(%s),
+        %s UUID NOT NULL REFERENCES %s(%s),
+        UNIQUE(%s, %s)
+    )`, partnershipsTable, partnershipIDColumn, 
+       user1IDColumn, usersTable, userIDColumn,
+       user2IDColumn, usersTable, userIDColumn,
+       user1IDColumn, user2IDColumn)
+    
+    _, err = s.db.Exec(context.Background(), partnershipsSQL)
+    if err != nil {
+        return errors.Wrap(err, "создание таблицы partnerships")
+    }
 
-	//индексы
 	indexesSQL := fmt.Sprintf(`
 	CREATE INDEX IF NOT EXISTS idx_users_username ON %s(%s);
 	CREATE INDEX IF NOT EXISTS idx_users_email ON %s(%s);
-	CREATE INDEX IF NOT EXISTS idx_partnerships_player1 ON %s(%s);
-	CREATE INDEX IF NOT EXISTS idx_partnerships_player2 ON %s(%s);
+	CREATE INDEX IF NOT EXISTS idx_partnerships_user1 ON %s(%s);
+	CREATE INDEX IF NOT EXISTS idx_partnerships_user2 ON %s(%s);
 	`, usersTable, usernameColumn,
 	   usersTable, emailColumn,
-	   partnershipsTable, player1IDColumn,
-	   partnershipsTable, player2IDColumn)
+	   partnershipsTable, user1IDColumn,
+	   partnershipsTable, user2IDColumn)
 	
 	_, err = s.db.Exec(context.Background(), indexesSQL)
 	if err != nil {

@@ -7,65 +7,32 @@ import "models/game_model.proto";
 import "google/api/annotations.proto";
 
 service GameService {
-    // Игровые сессии
-    rpc GetGameSessionsByIDs (GetGameSessionsByIDsRequest) returns (GetGameSessionsByIDsResponse) {
+    rpc GetGameState (GetGameStateRequest) returns (GetGameStateResponse) {
         option (google.api.http) = {
-            post: "/game-sessions/get-by-ids"
-            body: "*"
+            get: "/game/{partnership_id}/state"
         };
     }
 
-    rpc UpsertGameSessions (UpsertGameSessionsRequest) returns (UpsertGameSessionsResponse) {
+    rpc MoveToNextRoom (MoveToNextRoomRequest) returns (MoveToNextRoomResponse) {
         option (google.api.http) = {
-            post: "/game-sessions/upsert"
-            body: "*"
-        };
-    }
-    
-    // Состояния игр
-    rpc GetGameStatesByIDs (GetGameStatesByIDsRequest) returns (GetGameStatesByIDsResponse) {
-        option (google.api.http) = {
-            post: "/game-states/get-by-ids"
-            body: "*"
-        };
-    }
-
-    rpc UpsertGameStates (UpsertGameStatesRequest) returns (UpsertGameStatesResponse) {
-        option (google.api.http) = {
-            post: "/game-states/upsert"
+            post: "/game/{partnership_id}/move"
             body: "*"
         };
     }
 }
 
-// Запросы для игровых сессий
-message GetGameSessionsByIDsRequest {
-    repeated uint64 ids = 1;
+message GetGameStateRequest {
+    string partnership_id = 1;
 }
 
-message GetGameSessionsByIDsResponse {
-    repeated game.models.v1.GameSessionModel game_sessions = 1;
+message GetGameStateResponse {
+    game.models.v1.GameState game_state = 1;
 }
 
-message UpsertGameSessionsRequest {
-    repeated game.models.v1.GameSessionUpsertModel game_sessions = 1;
+message MoveToNextRoomRequest {
+    string partnership_id = 1;
 }
 
-message UpsertGameSessionsResponse {
-}
-
-// Запросы для состояний игр
-message GetGameStatesByIDsRequest {
-    repeated uint64 ids = 1;
-}
-
-message GetGameStatesByIDsResponse {
-    repeated game.models.v1.GameStateModel game_states = 1;
-}
-
-message UpsertGameStatesRequest {
-    repeated game.models.v1.GameStateUpsertModel game_states = 1;
-}
-
-message UpsertGameStatesResponse {
+message MoveToNextRoomResponse {
+    game.models.v1.GameState new_game_state = 1;
 }

@@ -3,20 +3,32 @@ package auth_processor
 import (
     "context"
 
-    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+    "github.com/segmentio/kafka-go"
 )
 
 type authService interface {
-    UpsertUsers(ctx context.Context, users []*models.User) error
-    UpsertPartnerships(ctx context.Context, partnerships []*models.Partnership) error
+    HandleRoomCompleted(ctx context.Context, userID string, roomNumber int32) error
+}
+
+type EventSender interface {
+    SendPartnershipCreated(ctx context.Context, partnershipID, user1ID, user2ID string) error
+    SendPartnershipTerminated(ctx context.Context, partnershipID string) error
 }
 
 type AuthProcessor struct {
-    authService authService
+    authService       authService
+    partnershipWriter *kafka.Writer
 }
 
-func NewAuthProcessor(authService authService) *AuthProcessor {
+func NewAuthProcessor(authService authService, kafkaBrokers []string) *AuthProcessor {
+    partnershipWriter := &kafka.Writer{
+        Addr:     kafka.TCP(kafkaBrokers...),
+        Topic:    "partnership_events",
+        Balancer: &kafka.LeastBytes{},
+    }
+    
     return &AuthProcessor{
-        authService: authService,
+        authService:       authService,
+        partnershipWriter: partnershipWriter,
     }
 }

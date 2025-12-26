@@ -1,25 +1,24 @@
 package game_consumer
 
 import (
-    "context"
-    "github.com/nineteen-night/empty-room-game/internal/game/models"
+	"context"
 )
 
 type gameProcessor interface {
-    HandleGameSessions(ctx context.Context, session *models.GameSession) error
-    HandleGameStates(ctx context.Context, state *models.GameState) error
+	HandlePartnershipCreated(ctx context.Context, partnershipID, user1ID, user2ID string) error
+	HandlePartnershipTerminated(ctx context.Context, partnershipID string) error
 }
 
 type GameConsumer struct {
-    gameProcessor gameProcessor
-    kafkaBroker   []string
-    topicName     string
+	gameProcessor gameProcessor
+	kafkaBrokers  []string
+	topicName     string
 }
 
-func NewGameConsumer(gameProcessor gameProcessor, kafkaBroker []string, topicName string) *GameConsumer {
-    return &GameConsumer{
-        gameProcessor: gameProcessor,
-        kafkaBroker:   kafkaBroker,
-        topicName:     topicName,
-    }
+func NewGameConsumer(gameProcessor gameProcessor, kafkaBrokers []string, topicName string) *GameConsumer {
+	return &GameConsumer{
+		gameProcessor: gameProcessor,
+		kafkaBrokers:  kafkaBrokers,
+		topicName:     topicName,
+	}
 }

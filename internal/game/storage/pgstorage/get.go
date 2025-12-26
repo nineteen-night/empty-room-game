@@ -1,91 +1,120 @@
 package pgstorage
 
 import (
-    "context"
+	"context"
 
-    "github.com/nineteen-night/empty-room-game/internal/game/models"
-    "github.com/Masterminds/squirrel"
-    "github.com/pkg/errors"
+	"github.com/nineteen-night/empty-room-game/internal/game/models"
+	"github.com/Masterminds/squirrel"
+	"github.com/pkg/errors"
 )
 
-func (storage *PGstorage) GetGameSessionsByIDs(ctx context.Context, IDs []uint64) ([]*models.GameSession, error) {
-    if len(IDs) == 0 {
-        return []*models.GameSession{}, nil
-    }
-    
-    query := storage.getGameSessionsQuery(IDs)
-    queryText, args, err := query.ToSql()
-    if err != nil {
-        return nil, errors.Wrap(err, "generate query error")
-    }
-    rows, err := storage.db.Query(ctx, queryText, args...)
-    if err != nil {
-        return nil, errors.Wrap(err, "query error")
-    }
-    defer rows.Close()
-    
-    var sessions []*models.GameSession
-    for rows.Next() {
-        var session models.GameSession
-        if err := rows.Scan(&session.ID, &session.PartnershipID, &session.CurrentRoom, &session.Status, &session.CurrentPlayerID); err != nil {
-            return nil, errors.Wrap(err, "failed to scan row")
-        }
-        sessions = append(sessions, &session)
-    }
-    return sessions, nil
+func (s *PGStorage) GetGameSession(ctx context.Context, partnershipID string) (*models.GameSession, error) {
+	query := squirrel.Select(
+		partnershipIDColumn,
+		user1IDColumn,
+		user2IDColumn,
+		currentRoomColumn,
+	).
+		From(gameSessionsTable).
+		Where(squirrel.Eq{partnershipIDColumn: partnershipID}).
+		PlaceholderFormat(squirrel.Dollar)
+
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return nil, errors.Wrap(err, "generate query error")
+	}
+
+	var session models.GameSession
+	err = s.db.QueryRow(ctx, queryText, args...).Scan(
+		&session.PartnershipID,
+		&session.User1ID,
+		&session.User2ID,
+		&session.CurrentRoom,
+	)
+
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, errors.Wrap(err, "query error")
+	}
+
+	return &session, nil
 }
 
-func (storage *PGstorage) getGameSessionsQuery(IDs []uint64) squirrel.Sqlizer {
-    q := squirrel.Select(
-        gameSessionIDColumn,
-        partnershipIDColumn,
-        currentRoomColumn,
-        statusColumn,
-        currentPlayerIDColumn,
-    ).
-        From(gameSessionsTable).
-        Where(squirrel.Eq{gameSessionIDColumn: IDs}).
-        PlaceholderFormat(squirrel.Dollar)
-    return q
+func (s *PGStorage) GetRoomByNumber(ctx context.Context, roomNumber int32) (*models.Room, error) {
+	query := squirrel.Select(
+		roomNumberColumn,
+		nameColumn,
+		descriptionColumn,
+	).
+		From(roomsTable).
+		Where(squirrel.Eq{roomNumberColumn: roomNumber}).
+		PlaceholderFormat(squirrel.Dollar)
+
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return nil, errors.Wrap(err, "generate query error")
+	}
+
+	var room models.Room
+	err = s.db.QueryRow(ctx, queryText, args...).Scan(
+		&room.RoomNumber,
+		&room.Name,
+		&room.Description,
+	)
+
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, errors.Wrap(err, "query error")
+	}
+
+	return &room, nil
 }
 
-func (storage *PGstorage) GetGameStatesByIDs(ctx context.Context, IDs []uint64) ([]*models.GameState, error) {
-    if len(IDs) == 0 {
-        return []*models.GameState{}, nil
-    }
-    
-    query := storage.getGameStatesQuery(IDs)
-    queryText, args, err := query.ToSql()
-    if err != nil {
-        return nil, errors.Wrap(err, "generate query error")
-    }
-    rows, err := storage.db.Query(ctx, queryText, args...)
-    if err != nil {
-        return nil, errors.Wrap(err, "query error")
-    }
-    defer rows.Close()
-    
-    var states []*models.GameState
-    for rows.Next() {
-        var state models.GameState
-        if err := rows.Scan(&state.ID, &state.GameSessionID, &state.Inventory, &state.PuzzlesSolved, &state.CurrentRoomID); err != nil {
-            return nil, errors.Wrap(err, "failed to scan row")
-        }
-        states = append(states, &state)
-    }
-    return states, nil
-}
+func (s *PGStorage) GetGameSessionsByUserID(ctx context.Context, userID string) ([]*models.GameSession, error) {
+	query := squirrel.Select(
+		partnershipIDColumn,
+		user1IDColumn,
+		user2IDColumn,
+		currentRoomColumn,
+	).
+		From(gameSessionsTable).
+		Where(
+			squirrel.Or{
+				squirrel.Eq{user1IDColumn: userID},
+				squirrel.Eq{user2IDColumn: userID},
+			},
+		).
+		PlaceholderFormat(squirrel.Dollar)
 
-func (storage *PGstorage) getGameStatesQuery(IDs []uint64) squirrel.Sqlizer {
-    q := squirrel.Select(
-        gameStateIDColumn,
-        gameSessionIDColumn,
-        inventoryColumn,
-        puzzlesSolvedColumn,
-        currentRoomIDColumn,
-    ).
-        From(gameStatesTable).
-        Where(squirrel.Eq{gameStateIDColumn: IDs}).
-        PlaceholderFormat(squirrel.Dollar)
-    return q
+	queryText, args, err := query.ToSql()
+	if err != nil {
+		return nil, errors.Wrap(err, "generate query error")
+	}
+
+	rows, err := s.db.Query(ctx, queryText, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "query error")
+	}
+	defer rows.Close()
+
+	var sessions []*models.GameSession
+	for rows.Next() {
+		var session models.GameSession
+		err := rows.Scan(
+			&session.PartnershipID,
+			&session.User1ID,
+			&session.User2ID,
+			&session.CurrentRoom,
+		)
+		if err != nil {
+			return nil, errors.Wrap(err, "scan error")
+		}
+		sessions = append(sessions, &session)
+	}
+
+	return sessions, nil
 }

@@ -20,10 +20,14 @@ func main() {
     }
 
     authstorage := bootstrap.InitPGStorage(cfg)
+    defer authstorage.Close()
+    
     authservice := bootstrap.InitAuthService(authstorage, cfg)
-    authprocessor := bootstrap.InitAuthProcessor(authservice)
-    authupsertconsumer := bootstrap.InitAuthUpsertConsumer(cfg, authprocessor)
+    authprocessor := bootstrap.InitAuthProcessor(authservice, cfg)
+    authservice.SetEventSender(authprocessor)
+    
+    roomcompletedconsumer := bootstrap.InitRoomCompletedConsumer(cfg, authprocessor)
     authapi := bootstrap.InitAuthServiceAPI(authservice)
 
-    bootstrap.AppRun(*authapi, authupsertconsumer)
+    bootstrap.AppRun(*authapi, roomcompletedconsumer)
 }

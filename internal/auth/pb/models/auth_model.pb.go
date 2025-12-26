@@ -21,30 +21,32 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type UserModel struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	PasswordHash  string                 `protobuf:"bytes,4,opt,name=password_hash,json=passwordHash,proto3" json:"password_hash,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+// Модель пользователя
+type User struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username       string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Email          string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	PasswordHash   string                 `protobuf:"bytes,4,opt,name=password_hash,json=passwordHash,proto3" json:"password_hash,omitempty"`
+	MaxRoomReached int32                  `protobuf:"varint,5,opt,name=max_room_reached,json=maxRoomReached,proto3" json:"max_room_reached,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x *UserModel) Reset() {
-	*x = UserModel{}
+func (x *User) Reset() {
+	*x = User{}
 	mi := &file_models_auth_model_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserModel) String() string {
+func (x *User) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserModel) ProtoMessage() {}
+func (*User) ProtoMessage() {}
 
-func (x *UserModel) ProtoReflect() protoreflect.Message {
+func (x *User) ProtoReflect() protoreflect.Message {
 	mi := &file_models_auth_model_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,62 +58,70 @@ func (x *UserModel) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserModel.ProtoReflect.Descriptor instead.
-func (*UserModel) Descriptor() ([]byte, []int) {
+// Deprecated: Use User.ProtoReflect.Descriptor instead.
+func (*User) Descriptor() ([]byte, []int) {
 	return file_models_auth_model_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UserModel) GetId() uint64 {
+func (x *User) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
-func (x *UserModel) GetUsername() string {
+func (x *User) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
-func (x *UserModel) GetEmail() string {
+func (x *User) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *UserModel) GetPasswordHash() string {
+func (x *User) GetPasswordHash() string {
 	if x != nil {
 		return x.PasswordHash
 	}
 	return ""
 }
 
-type UserUpsertModel struct {
+func (x *User) GetMaxRoomReached() int32 {
+	if x != nil {
+		return x.MaxRoomReached
+	}
+	return 0
+}
+
+// Модель партнёрства
+type Partnership struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	User1Id       string                 `protobuf:"bytes,2,opt,name=user1_id,json=user1Id,proto3" json:"user1_id,omitempty"`
+	User2Id       string                 `protobuf:"bytes,3,opt,name=user2_id,json=user2Id,proto3" json:"user2_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserUpsertModel) Reset() {
-	*x = UserUpsertModel{}
+func (x *Partnership) Reset() {
+	*x = Partnership{}
 	mi := &file_models_auth_model_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserUpsertModel) String() string {
+func (x *Partnership) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserUpsertModel) ProtoMessage() {}
+func (*Partnership) ProtoMessage() {}
 
-func (x *UserUpsertModel) ProtoReflect() protoreflect.Message {
+func (x *Partnership) ProtoReflect() protoreflect.Message {
 	mi := &file_models_auth_model_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -123,178 +133,47 @@ func (x *UserUpsertModel) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserUpsertModel.ProtoReflect.Descriptor instead.
-func (*UserUpsertModel) Descriptor() ([]byte, []int) {
+// Deprecated: Use Partnership.ProtoReflect.Descriptor instead.
+func (*Partnership) Descriptor() ([]byte, []int) {
 	return file_models_auth_model_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *UserUpsertModel) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *UserUpsertModel) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-func (x *UserUpsertModel) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-type PartnershipModel struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Player1Id     uint64                 `protobuf:"varint,2,opt,name=player1_id,json=player1Id,proto3" json:"player1_id,omitempty"`
-	Player2Id     uint64                 `protobuf:"varint,3,opt,name=player2_id,json=player2Id,proto3" json:"player2_id,omitempty"`
-	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PartnershipModel) Reset() {
-	*x = PartnershipModel{}
-	mi := &file_models_auth_model_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PartnershipModel) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PartnershipModel) ProtoMessage() {}
-
-func (x *PartnershipModel) ProtoReflect() protoreflect.Message {
-	mi := &file_models_auth_model_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PartnershipModel.ProtoReflect.Descriptor instead.
-func (*PartnershipModel) Descriptor() ([]byte, []int) {
-	return file_models_auth_model_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *PartnershipModel) GetId() uint64 {
+func (x *Partnership) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
-func (x *PartnershipModel) GetPlayer1Id() uint64 {
+func (x *Partnership) GetUser1Id() string {
 	if x != nil {
-		return x.Player1Id
-	}
-	return 0
-}
-
-func (x *PartnershipModel) GetPlayer2Id() uint64 {
-	if x != nil {
-		return x.Player2Id
-	}
-	return 0
-}
-
-func (x *PartnershipModel) GetStatus() string {
-	if x != nil {
-		return x.Status
+		return x.User1Id
 	}
 	return ""
 }
 
-type PartnershipUpsertModel struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Player1Id     uint64                 `protobuf:"varint,1,opt,name=player1_id,json=player1Id,proto3" json:"player1_id,omitempty"`
-	Player2Id     uint64                 `protobuf:"varint,2,opt,name=player2_id,json=player2Id,proto3" json:"player2_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PartnershipUpsertModel) Reset() {
-	*x = PartnershipUpsertModel{}
-	mi := &file_models_auth_model_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PartnershipUpsertModel) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PartnershipUpsertModel) ProtoMessage() {}
-
-func (x *PartnershipUpsertModel) ProtoReflect() protoreflect.Message {
-	mi := &file_models_auth_model_proto_msgTypes[3]
+func (x *Partnership) GetUser2Id() string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
+		return x.User2Id
 	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PartnershipUpsertModel.ProtoReflect.Descriptor instead.
-func (*PartnershipUpsertModel) Descriptor() ([]byte, []int) {
-	return file_models_auth_model_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *PartnershipUpsertModel) GetPlayer1Id() uint64 {
-	if x != nil {
-		return x.Player1Id
-	}
-	return 0
-}
-
-func (x *PartnershipUpsertModel) GetPlayer2Id() uint64 {
-	if x != nil {
-		return x.Player2Id
-	}
-	return 0
+	return ""
 }
 
 var File_models_auth_model_proto protoreflect.FileDescriptor
 
 const file_models_auth_model_proto_rawDesc = "" +
 	"\n" +
-	"\x17models/auth_model.proto\x12\x0eauth.models.v1\"r\n" +
-	"\tUserModel\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
+	"\x17models/auth_model.proto\x12\x0eauth.models.v1\"\x97\x01\n" +
+	"\x04User\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12#\n" +
-	"\rpassword_hash\x18\x04 \x01(\tR\fpasswordHash\"_\n" +
-	"\x0fUserUpsertModel\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\"x\n" +
-	"\x10PartnershipModel\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1d\n" +
-	"\n" +
-	"player1_id\x18\x02 \x01(\x04R\tplayer1Id\x12\x1d\n" +
-	"\n" +
-	"player2_id\x18\x03 \x01(\x04R\tplayer2Id\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\"V\n" +
-	"\x16PartnershipUpsertModel\x12\x1d\n" +
-	"\n" +
-	"player1_id\x18\x01 \x01(\x04R\tplayer1Id\x12\x1d\n" +
-	"\n" +
-	"player2_id\x18\x02 \x01(\x04R\tplayer2IdBCZAgithub.com/nineteen-night/empty-room-game/internal/auth/pb/modelsb\x06proto3"
+	"\rpassword_hash\x18\x04 \x01(\tR\fpasswordHash\x12(\n" +
+	"\x10max_room_reached\x18\x05 \x01(\x05R\x0emaxRoomReached\"S\n" +
+	"\vPartnership\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
+	"\buser1_id\x18\x02 \x01(\tR\auser1Id\x12\x19\n" +
+	"\buser2_id\x18\x03 \x01(\tR\auser2IdBCZAgithub.com/nineteen-night/empty-room-game/internal/auth/pb/modelsb\x06proto3"
 
 var (
 	file_models_auth_model_proto_rawDescOnce sync.Once
@@ -308,12 +187,10 @@ func file_models_auth_model_proto_rawDescGZIP() []byte {
 	return file_models_auth_model_proto_rawDescData
 }
 
-var file_models_auth_model_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_models_auth_model_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_models_auth_model_proto_goTypes = []any{
-	(*UserModel)(nil),              // 0: auth.models.v1.UserModel
-	(*UserUpsertModel)(nil),        // 1: auth.models.v1.UserUpsertModel
-	(*PartnershipModel)(nil),       // 2: auth.models.v1.PartnershipModel
-	(*PartnershipUpsertModel)(nil), // 3: auth.models.v1.PartnershipUpsertModel
+	(*User)(nil),        // 0: auth.models.v1.User
+	(*Partnership)(nil), // 1: auth.models.v1.Partnership
 }
 var file_models_auth_model_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -334,7 +211,7 @@ func file_models_auth_model_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_models_auth_model_proto_rawDesc), len(file_models_auth_model_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

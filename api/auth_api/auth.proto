@@ -7,65 +7,80 @@ import "models/auth_model.proto";
 import "google/api/annotations.proto";
 
 service AuthService {
-    // Пользователи
-    rpc GetUsersByIDs (GetUsersByIDsRequest) returns (GetUsersByIDsResponse) {
+    rpc Register (RegisterRequest) returns (RegisterResponse) {
         option (google.api.http) = {
-            post: "/users/get-by-ids"
+            post: "/auth/register"
             body: "*"
         };
     }
 
-    rpc UpsertUsers (UpsertUsersRequest) returns (UpsertUsersResponse) {
+    rpc Login (LoginRequest) returns (LoginResponse) {
         option (google.api.http) = {
-            post: "/users/upsert"
+            post: "/auth/login"
             body: "*"
         };
     }
 
-    // Партнёрства
-    rpc GetPartnershipsByIDs (GetPartnershipsByIDsRequest) returns (GetPartnershipsByIDsResponse) {
+    rpc CreatePartnership (CreatePartnershipRequest) returns (CreatePartnershipResponse) {
         option (google.api.http) = {
-            post: "/partnerships/get-by-ids"
+            post: "/partnership"
             body: "*"
         };
     }
 
-    rpc UpsertPartnerships (UpsertPartnershipsRequest) returns (UpsertPartnershipsResponse) {
+    rpc TerminatePartnership (TerminatePartnershipRequest) returns (TerminatePartnershipResponse) {
         option (google.api.http) = {
-            post: "/partnerships/upsert"
-            body: "*"
+            delete: "/partnership/{partnership_id}"
+        };
+    }
+
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/user/{user_id}"
         };
     }
 }
 
-// Запросы для пользователей
-message GetUsersByIDsRequest {
-    repeated uint64 ids = 1;
+message RegisterRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
 }
 
-message GetUsersByIDsResponse {
-    repeated auth.models.v1.UserModel users = 1;
+message RegisterResponse {
+    auth.models.v1.User user = 1;
 }
 
-message UpsertUsersRequest {
-    repeated auth.models.v1.UserUpsertModel users = 1;
+message LoginRequest {
+    string username = 1;
+    string password = 2;
 }
 
-message UpsertUsersResponse {
+message LoginResponse {
+    auth.models.v1.User user = 1;
 }
 
-// Запросы для партнёрств
-message GetPartnershipsByIDsRequest {
-    repeated uint64 ids = 1;
+message CreatePartnershipRequest {
+    string user_id = 1;
+    string partner_username = 2;
 }
 
-message GetPartnershipsByIDsResponse {
-    repeated auth.models.v1.PartnershipModel partnerships = 1;
+message CreatePartnershipResponse {
+    auth.models.v1.Partnership partnership = 1;
 }
 
-message UpsertPartnershipsRequest {
-    repeated auth.models.v1.PartnershipUpsertModel partnerships = 1;
+message TerminatePartnershipRequest {
+    string partnership_id = 1;
 }
 
-message UpsertPartnershipsResponse {
+message TerminatePartnershipResponse {
+    bool success = 1;
+}
+
+message GetUserRequest {
+    string user_id = 1;
+}
+
+message GetUserResponse {
+    auth.models.v1.User user = 1;
 }

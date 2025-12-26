@@ -2,12 +2,10 @@ package auth_consumer
 
 import (
     "context"
-    "github.com/nineteen-night/empty-room-game/internal/auth/models"
 )
 
 type authProcessor interface {
-    HandleUsers(ctx context.Context, user *models.User) error
-    HandlePartnerships(ctx context.Context, partnership *models.Partnership) error
+    HandleRoomCompleted(ctx context.Context, userID string, roomNumber int32) error
 }
 
 type AuthConsumer struct {

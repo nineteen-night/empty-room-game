@@ -2,7 +2,10 @@
 
 cd "$(dirname "$0")/.." || exit
 
+echo "Generating protobuf code..."
+
 # Генерация для Auth Service
+echo "Generating Auth Service..."
 protoc -I ./api \
   -I ./api/google/api \
   --go_out=./internal/auth/pb --go_opt=paths=source_relative \
@@ -25,6 +28,7 @@ protoc -I ./api \
   ./api/auth_api/auth.proto
 
 # Генерация для Game Service
+echo "Generating Game Service..."
 protoc -I ./api \
   -I ./api/google/api \
   --go_out=./internal/game/pb --go_opt=paths=source_relative \
@@ -45,3 +49,5 @@ protoc -I ./api \
   --openapiv2_out=./internal/game/pb/swagger \
   --openapiv2_opt logtostderr=true \
   ./api/game_api/game.proto
+
+echo "Generation completed!"

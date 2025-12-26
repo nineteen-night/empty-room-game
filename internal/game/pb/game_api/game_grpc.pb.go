@@ -19,22 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GameService_GetGameSessionsByIDs_FullMethodName = "/game.service.v1.GameService/GetGameSessionsByIDs"
-	GameService_UpsertGameSessions_FullMethodName   = "/game.service.v1.GameService/UpsertGameSessions"
-	GameService_GetGameStatesByIDs_FullMethodName   = "/game.service.v1.GameService/GetGameStatesByIDs"
-	GameService_UpsertGameStates_FullMethodName     = "/game.service.v1.GameService/UpsertGameStates"
+	GameService_GetGameState_FullMethodName   = "/game.service.v1.GameService/GetGameState"
+	GameService_MoveToNextRoom_FullMethodName = "/game.service.v1.GameService/MoveToNextRoom"
 )
 
 // GameServiceClient is the client API for GameService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameServiceClient interface {
-	// Игровые сессии
-	GetGameSessionsByIDs(ctx context.Context, in *GetGameSessionsByIDsRequest, opts ...grpc.CallOption) (*GetGameSessionsByIDsResponse, error)
-	UpsertGameSessions(ctx context.Context, in *UpsertGameSessionsRequest, opts ...grpc.CallOption) (*UpsertGameSessionsResponse, error)
-	// Состояния игр
-	GetGameStatesByIDs(ctx context.Context, in *GetGameStatesByIDsRequest, opts ...grpc.CallOption) (*GetGameStatesByIDsResponse, error)
-	UpsertGameStates(ctx context.Context, in *UpsertGameStatesRequest, opts ...grpc.CallOption) (*UpsertGameStatesResponse, error)
+	// Получение состояния игры
+	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (*GetGameStateResponse, error)
+	// Переход в следующую комнату
+	MoveToNextRoom(ctx context.Context, in *MoveToNextRoomRequest, opts ...grpc.CallOption) (*MoveToNextRoomResponse, error)
 }
 
 type gameServiceClient struct {
@@ -45,40 +41,20 @@ func NewGameServiceClient(cc grpc.ClientConnInterface) GameServiceClient {
 	return &gameServiceClient{cc}
 }
 
-func (c *gameServiceClient) GetGameSessionsByIDs(ctx context.Context, in *GetGameSessionsByIDsRequest, opts ...grpc.CallOption) (*GetGameSessionsByIDsResponse, error) {
+func (c *gameServiceClient) GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (*GetGameStateResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGameSessionsByIDsResponse)
-	err := c.cc.Invoke(ctx, GameService_GetGameSessionsByIDs_FullMethodName, in, out, cOpts...)
+	out := new(GetGameStateResponse)
+	err := c.cc.Invoke(ctx, GameService_GetGameState_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *gameServiceClient) UpsertGameSessions(ctx context.Context, in *UpsertGameSessionsRequest, opts ...grpc.CallOption) (*UpsertGameSessionsResponse, error) {
+func (c *gameServiceClient) MoveToNextRoom(ctx context.Context, in *MoveToNextRoomRequest, opts ...grpc.CallOption) (*MoveToNextRoomResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpsertGameSessionsResponse)
-	err := c.cc.Invoke(ctx, GameService_UpsertGameSessions_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameServiceClient) GetGameStatesByIDs(ctx context.Context, in *GetGameStatesByIDsRequest, opts ...grpc.CallOption) (*GetGameStatesByIDsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetGameStatesByIDsResponse)
-	err := c.cc.Invoke(ctx, GameService_GetGameStatesByIDs_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gameServiceClient) UpsertGameStates(ctx context.Context, in *UpsertGameStatesRequest, opts ...grpc.CallOption) (*UpsertGameStatesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpsertGameStatesResponse)
-	err := c.cc.Invoke(ctx, GameService_UpsertGameStates_FullMethodName, in, out, cOpts...)
+	out := new(MoveToNextRoomResponse)
+	err := c.cc.Invoke(ctx, GameService_MoveToNextRoom_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +65,10 @@ func (c *gameServiceClient) UpsertGameStates(ctx context.Context, in *UpsertGame
 // All implementations must embed UnimplementedGameServiceServer
 // for forward compatibility.
 type GameServiceServer interface {
-	// Игровые сессии
-	GetGameSessionsByIDs(context.Context, *GetGameSessionsByIDsRequest) (*GetGameSessionsByIDsResponse, error)
-	UpsertGameSessions(context.Context, *UpsertGameSessionsRequest) (*UpsertGameSessionsResponse, error)
-	// Состояния игр
-	GetGameStatesByIDs(context.Context, *GetGameStatesByIDsRequest) (*GetGameStatesByIDsResponse, error)
-	UpsertGameStates(context.Context, *UpsertGameStatesRequest) (*UpsertGameStatesResponse, error)
+	// Получение состояния игры
+	GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error)
+	// Переход в следующую комнату
+	MoveToNextRoom(context.Context, *MoveToNextRoomRequest) (*MoveToNextRoomResponse, error)
 	mustEmbedUnimplementedGameServiceServer()
 }
 
@@ -105,17 +79,11 @@ type GameServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGameServiceServer struct{}
 
-func (UnimplementedGameServiceServer) GetGameSessionsByIDs(context.Context, *GetGameSessionsByIDsRequest) (*GetGameSessionsByIDsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetGameSessionsByIDs not implemented")
+func (UnimplementedGameServiceServer) GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetGameState not implemented")
 }
-func (UnimplementedGameServiceServer) UpsertGameSessions(context.Context, *UpsertGameSessionsRequest) (*UpsertGameSessionsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpsertGameSessions not implemented")
-}
-func (UnimplementedGameServiceServer) GetGameStatesByIDs(context.Context, *GetGameStatesByIDsRequest) (*GetGameStatesByIDsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetGameStatesByIDs not implemented")
-}
-func (UnimplementedGameServiceServer) UpsertGameStates(context.Context, *UpsertGameStatesRequest) (*UpsertGameStatesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpsertGameStates not implemented")
+func (UnimplementedGameServiceServer) MoveToNextRoom(context.Context, *MoveToNextRoomRequest) (*MoveToNextRoomResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MoveToNextRoom not implemented")
 }
 func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
 func (UnimplementedGameServiceServer) testEmbeddedByValue()                     {}
@@ -138,74 +106,38 @@ func RegisterGameServiceServer(s grpc.ServiceRegistrar, srv GameServiceServer) {
 	s.RegisterService(&GameService_ServiceDesc, srv)
 }
 
-func _GameService_GetGameSessionsByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGameSessionsByIDsRequest)
+func _GameService_GetGameState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGameStateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServiceServer).GetGameSessionsByIDs(ctx, in)
+		return srv.(GameServiceServer).GetGameState(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameService_GetGameSessionsByIDs_FullMethodName,
+		FullMethod: GameService_GetGameState_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).GetGameSessionsByIDs(ctx, req.(*GetGameSessionsByIDsRequest))
+		return srv.(GameServiceServer).GetGameState(ctx, req.(*GetGameStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GameService_UpsertGameSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertGameSessionsRequest)
+func _GameService_MoveToNextRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MoveToNextRoomRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServiceServer).UpsertGameSessions(ctx, in)
+		return srv.(GameServiceServer).MoveToNextRoom(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GameService_UpsertGameSessions_FullMethodName,
+		FullMethod: GameService_MoveToNextRoom_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).UpsertGameSessions(ctx, req.(*UpsertGameSessionsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GameService_GetGameStatesByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGameStatesByIDsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServiceServer).GetGameStatesByIDs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GameService_GetGameStatesByIDs_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).GetGameStatesByIDs(ctx, req.(*GetGameStatesByIDsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GameService_UpsertGameStates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertGameStatesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GameServiceServer).UpsertGameStates(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GameService_UpsertGameStates_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServiceServer).UpsertGameStates(ctx, req.(*UpsertGameStatesRequest))
+		return srv.(GameServiceServer).MoveToNextRoom(ctx, req.(*MoveToNextRoomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -218,20 +150,12 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GameServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetGameSessionsByIDs",
-			Handler:    _GameService_GetGameSessionsByIDs_Handler,
+			MethodName: "GetGameState",
+			Handler:    _GameService_GetGameState_Handler,
 		},
 		{
-			MethodName: "UpsertGameSessions",
-			Handler:    _GameService_UpsertGameSessions_Handler,
-		},
-		{
-			MethodName: "GetGameStatesByIDs",
-			Handler:    _GameService_GetGameStatesByIDs_Handler,
-		},
-		{
-			MethodName: "UpsertGameStates",
-			Handler:    _GameService_UpsertGameStates_Handler,
+			MethodName: "MoveToNextRoom",
+			Handler:    _GameService_MoveToNextRoom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

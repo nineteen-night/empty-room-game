@@ -23,28 +23,28 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Запросы для игровых сессий
-type GetGameSessionsByIDsRequest struct {
+// Запросы
+type GetGameStateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
+	PartnershipId string                 `protobuf:"bytes,1,opt,name=partnership_id,json=partnershipId,proto3" json:"partnership_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetGameSessionsByIDsRequest) Reset() {
-	*x = GetGameSessionsByIDsRequest{}
+func (x *GetGameStateRequest) Reset() {
+	*x = GetGameStateRequest{}
 	mi := &file_game_api_game_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetGameSessionsByIDsRequest) String() string {
+func (x *GetGameStateRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetGameSessionsByIDsRequest) ProtoMessage() {}
+func (*GetGameStateRequest) ProtoMessage() {}
 
-func (x *GetGameSessionsByIDsRequest) ProtoReflect() protoreflect.Message {
+func (x *GetGameStateRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_game_api_game_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,39 +56,39 @@ func (x *GetGameSessionsByIDsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetGameSessionsByIDsRequest.ProtoReflect.Descriptor instead.
-func (*GetGameSessionsByIDsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetGameStateRequest.ProtoReflect.Descriptor instead.
+func (*GetGameStateRequest) Descriptor() ([]byte, []int) {
 	return file_game_api_game_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetGameSessionsByIDsRequest) GetIds() []uint64 {
+func (x *GetGameStateRequest) GetPartnershipId() string {
 	if x != nil {
-		return x.Ids
+		return x.PartnershipId
 	}
-	return nil
+	return ""
 }
 
-type GetGameSessionsByIDsResponse struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	GameSessions  []*models.GameSessionModel `protobuf:"bytes,1,rep,name=game_sessions,json=gameSessions,proto3" json:"game_sessions,omitempty"`
+type GetGameStateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameState     *models.GameState      `protobuf:"bytes,1,opt,name=game_state,json=gameState,proto3" json:"game_state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetGameSessionsByIDsResponse) Reset() {
-	*x = GetGameSessionsByIDsResponse{}
+func (x *GetGameStateResponse) Reset() {
+	*x = GetGameStateResponse{}
 	mi := &file_game_api_game_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetGameSessionsByIDsResponse) String() string {
+func (x *GetGameStateResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetGameSessionsByIDsResponse) ProtoMessage() {}
+func (*GetGameStateResponse) ProtoMessage() {}
 
-func (x *GetGameSessionsByIDsResponse) ProtoReflect() protoreflect.Message {
+func (x *GetGameStateResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_game_api_game_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,39 +100,39 @@ func (x *GetGameSessionsByIDsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetGameSessionsByIDsResponse.ProtoReflect.Descriptor instead.
-func (*GetGameSessionsByIDsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetGameStateResponse.ProtoReflect.Descriptor instead.
+func (*GetGameStateResponse) Descriptor() ([]byte, []int) {
 	return file_game_api_game_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetGameSessionsByIDsResponse) GetGameSessions() []*models.GameSessionModel {
+func (x *GetGameStateResponse) GetGameState() *models.GameState {
 	if x != nil {
-		return x.GameSessions
+		return x.GameState
 	}
 	return nil
 }
 
-type UpsertGameSessionsRequest struct {
-	state         protoimpl.MessageState           `protogen:"open.v1"`
-	GameSessions  []*models.GameSessionUpsertModel `protobuf:"bytes,1,rep,name=game_sessions,json=gameSessions,proto3" json:"game_sessions,omitempty"`
+type MoveToNextRoomRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PartnershipId string                 `protobuf:"bytes,1,opt,name=partnership_id,json=partnershipId,proto3" json:"partnership_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertGameSessionsRequest) Reset() {
-	*x = UpsertGameSessionsRequest{}
+func (x *MoveToNextRoomRequest) Reset() {
+	*x = MoveToNextRoomRequest{}
 	mi := &file_game_api_game_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertGameSessionsRequest) String() string {
+func (x *MoveToNextRoomRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertGameSessionsRequest) ProtoMessage() {}
+func (*MoveToNextRoomRequest) ProtoMessage() {}
 
-func (x *UpsertGameSessionsRequest) ProtoReflect() protoreflect.Message {
+func (x *MoveToNextRoomRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_game_api_game_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,38 +144,39 @@ func (x *UpsertGameSessionsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertGameSessionsRequest.ProtoReflect.Descriptor instead.
-func (*UpsertGameSessionsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use MoveToNextRoomRequest.ProtoReflect.Descriptor instead.
+func (*MoveToNextRoomRequest) Descriptor() ([]byte, []int) {
 	return file_game_api_game_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UpsertGameSessionsRequest) GetGameSessions() []*models.GameSessionUpsertModel {
+func (x *MoveToNextRoomRequest) GetPartnershipId() string {
 	if x != nil {
-		return x.GameSessions
+		return x.PartnershipId
 	}
-	return nil
+	return ""
 }
 
-type UpsertGameSessionsResponse struct {
+type MoveToNextRoomResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	NewGameState  *models.GameState      `protobuf:"bytes,1,opt,name=new_game_state,json=newGameState,proto3" json:"new_game_state,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertGameSessionsResponse) Reset() {
-	*x = UpsertGameSessionsResponse{}
+func (x *MoveToNextRoomResponse) Reset() {
+	*x = MoveToNextRoomResponse{}
 	mi := &file_game_api_game_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertGameSessionsResponse) String() string {
+func (x *MoveToNextRoomResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertGameSessionsResponse) ProtoMessage() {}
+func (*MoveToNextRoomResponse) ProtoMessage() {}
 
-func (x *UpsertGameSessionsResponse) ProtoReflect() protoreflect.Message {
+func (x *MoveToNextRoomResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_game_api_game_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -187,206 +188,35 @@ func (x *UpsertGameSessionsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertGameSessionsResponse.ProtoReflect.Descriptor instead.
-func (*UpsertGameSessionsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MoveToNextRoomResponse.ProtoReflect.Descriptor instead.
+func (*MoveToNextRoomResponse) Descriptor() ([]byte, []int) {
 	return file_game_api_game_proto_rawDescGZIP(), []int{3}
 }
 
-// Запросы для состояний игр
-type GetGameStatesByIDsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetGameStatesByIDsRequest) Reset() {
-	*x = GetGameStatesByIDsRequest{}
-	mi := &file_game_api_game_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetGameStatesByIDsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetGameStatesByIDsRequest) ProtoMessage() {}
-
-func (x *GetGameStatesByIDsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_api_game_proto_msgTypes[4]
+func (x *MoveToNextRoomResponse) GetNewGameState() *models.GameState {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetGameStatesByIDsRequest.ProtoReflect.Descriptor instead.
-func (*GetGameStatesByIDsRequest) Descriptor() ([]byte, []int) {
-	return file_game_api_game_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetGameStatesByIDsRequest) GetIds() []uint64 {
-	if x != nil {
-		return x.Ids
+		return x.NewGameState
 	}
 	return nil
-}
-
-type GetGameStatesByIDsResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	GameStates    []*models.GameStateModel `protobuf:"bytes,1,rep,name=game_states,json=gameStates,proto3" json:"game_states,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetGameStatesByIDsResponse) Reset() {
-	*x = GetGameStatesByIDsResponse{}
-	mi := &file_game_api_game_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetGameStatesByIDsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetGameStatesByIDsResponse) ProtoMessage() {}
-
-func (x *GetGameStatesByIDsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_api_game_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetGameStatesByIDsResponse.ProtoReflect.Descriptor instead.
-func (*GetGameStatesByIDsResponse) Descriptor() ([]byte, []int) {
-	return file_game_api_game_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetGameStatesByIDsResponse) GetGameStates() []*models.GameStateModel {
-	if x != nil {
-		return x.GameStates
-	}
-	return nil
-}
-
-type UpsertGameStatesRequest struct {
-	state         protoimpl.MessageState         `protogen:"open.v1"`
-	GameStates    []*models.GameStateUpsertModel `protobuf:"bytes,1,rep,name=game_states,json=gameStates,proto3" json:"game_states,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpsertGameStatesRequest) Reset() {
-	*x = UpsertGameStatesRequest{}
-	mi := &file_game_api_game_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpsertGameStatesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpsertGameStatesRequest) ProtoMessage() {}
-
-func (x *UpsertGameStatesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_api_game_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpsertGameStatesRequest.ProtoReflect.Descriptor instead.
-func (*UpsertGameStatesRequest) Descriptor() ([]byte, []int) {
-	return file_game_api_game_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpsertGameStatesRequest) GetGameStates() []*models.GameStateUpsertModel {
-	if x != nil {
-		return x.GameStates
-	}
-	return nil
-}
-
-type UpsertGameStatesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpsertGameStatesResponse) Reset() {
-	*x = UpsertGameStatesResponse{}
-	mi := &file_game_api_game_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpsertGameStatesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpsertGameStatesResponse) ProtoMessage() {}
-
-func (x *UpsertGameStatesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_api_game_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpsertGameStatesResponse.ProtoReflect.Descriptor instead.
-func (*UpsertGameStatesResponse) Descriptor() ([]byte, []int) {
-	return file_game_api_game_proto_rawDescGZIP(), []int{7}
 }
 
 var File_game_api_game_proto protoreflect.FileDescriptor
 
 const file_game_api_game_proto_rawDesc = "" +
 	"\n" +
-	"\x13game_api/game.proto\x12\x0fgame.service.v1\x1a\x17models/game_model.proto\x1a\x1cgoogle/api/annotations.proto\"/\n" +
-	"\x1bGetGameSessionsByIDsRequest\x12\x10\n" +
-	"\x03ids\x18\x01 \x03(\x04R\x03ids\"e\n" +
-	"\x1cGetGameSessionsByIDsResponse\x12E\n" +
-	"\rgame_sessions\x18\x01 \x03(\v2 .game.models.v1.GameSessionModelR\fgameSessions\"h\n" +
-	"\x19UpsertGameSessionsRequest\x12K\n" +
-	"\rgame_sessions\x18\x01 \x03(\v2&.game.models.v1.GameSessionUpsertModelR\fgameSessions\"\x1c\n" +
-	"\x1aUpsertGameSessionsResponse\"-\n" +
-	"\x19GetGameStatesByIDsRequest\x12\x10\n" +
-	"\x03ids\x18\x01 \x03(\x04R\x03ids\"]\n" +
-	"\x1aGetGameStatesByIDsResponse\x12?\n" +
-	"\vgame_states\x18\x01 \x03(\v2\x1e.game.models.v1.GameStateModelR\n" +
-	"gameStates\"`\n" +
-	"\x17UpsertGameStatesRequest\x12E\n" +
-	"\vgame_states\x18\x01 \x03(\v2$.game.models.v1.GameStateUpsertModelR\n" +
-	"gameStates\"\x1a\n" +
-	"\x18UpsertGameStatesResponse2\xd9\x04\n" +
-	"\vGameService\x12\x99\x01\n" +
-	"\x14GetGameSessionsByIDs\x12,.game.service.v1.GetGameSessionsByIDsRequest\x1a-.game.service.v1.GetGameSessionsByIDsResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/game-sessions/get-by-ids\x12\x8f\x01\n" +
-	"\x12UpsertGameSessions\x12*.game.service.v1.UpsertGameSessionsRequest\x1a+.game.service.v1.UpsertGameSessionsResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/game-sessions/upsert\x12\x91\x01\n" +
-	"\x12GetGameStatesByIDs\x12*.game.service.v1.GetGameStatesByIDsRequest\x1a+.game.service.v1.GetGameStatesByIDsResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/game-states/get-by-ids\x12\x87\x01\n" +
-	"\x10UpsertGameStates\x12(.game.service.v1.UpsertGameStatesRequest\x1a).game.service.v1.UpsertGameStatesResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/game-states/upsertBEZCgithub.com/nineteen-night/empty-room-game/internal/game/pb/game_apib\x06proto3"
+	"\x13game_api/game.proto\x12\x0fgame.service.v1\x1a\x17models/game_model.proto\x1a\x1cgoogle/api/annotations.proto\"<\n" +
+	"\x13GetGameStateRequest\x12%\n" +
+	"\x0epartnership_id\x18\x01 \x01(\tR\rpartnershipId\"P\n" +
+	"\x14GetGameStateResponse\x128\n" +
+	"\n" +
+	"game_state\x18\x01 \x01(\v2\x19.game.models.v1.GameStateR\tgameState\">\n" +
+	"\x15MoveToNextRoomRequest\x12%\n" +
+	"\x0epartnership_id\x18\x01 \x01(\tR\rpartnershipId\"Y\n" +
+	"\x16MoveToNextRoomResponse\x12?\n" +
+	"\x0enew_game_state\x18\x01 \x01(\v2\x19.game.models.v1.GameStateR\fnewGameState2\x9d\x02\n" +
+	"\vGameService\x12\x81\x01\n" +
+	"\fGetGameState\x12$.game.service.v1.GetGameStateRequest\x1a%.game.service.v1.GetGameStateResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/game/{partnership_id}/state\x12\x89\x01\n" +
+	"\x0eMoveToNextRoom\x12&.game.service.v1.MoveToNextRoomRequest\x1a'.game.service.v1.MoveToNextRoomResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/game/{partnership_id}/moveBEZCgithub.com/nineteen-night/empty-room-game/internal/game/pb/game_apib\x06proto3"
 
 var (
 	file_game_api_game_proto_rawDescOnce sync.Once
@@ -400,39 +230,26 @@ func file_game_api_game_proto_rawDescGZIP() []byte {
 	return file_game_api_game_proto_rawDescData
 }
 
-var file_game_api_game_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_game_api_game_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_game_api_game_proto_goTypes = []any{
-	(*GetGameSessionsByIDsRequest)(nil),   // 0: game.service.v1.GetGameSessionsByIDsRequest
-	(*GetGameSessionsByIDsResponse)(nil),  // 1: game.service.v1.GetGameSessionsByIDsResponse
-	(*UpsertGameSessionsRequest)(nil),     // 2: game.service.v1.UpsertGameSessionsRequest
-	(*UpsertGameSessionsResponse)(nil),    // 3: game.service.v1.UpsertGameSessionsResponse
-	(*GetGameStatesByIDsRequest)(nil),     // 4: game.service.v1.GetGameStatesByIDsRequest
-	(*GetGameStatesByIDsResponse)(nil),    // 5: game.service.v1.GetGameStatesByIDsResponse
-	(*UpsertGameStatesRequest)(nil),       // 6: game.service.v1.UpsertGameStatesRequest
-	(*UpsertGameStatesResponse)(nil),      // 7: game.service.v1.UpsertGameStatesResponse
-	(*models.GameSessionModel)(nil),       // 8: game.models.v1.GameSessionModel
-	(*models.GameSessionUpsertModel)(nil), // 9: game.models.v1.GameSessionUpsertModel
-	(*models.GameStateModel)(nil),         // 10: game.models.v1.GameStateModel
-	(*models.GameStateUpsertModel)(nil),   // 11: game.models.v1.GameStateUpsertModel
+	(*GetGameStateRequest)(nil),    // 0: game.service.v1.GetGameStateRequest
+	(*GetGameStateResponse)(nil),   // 1: game.service.v1.GetGameStateResponse
+	(*MoveToNextRoomRequest)(nil),  // 2: game.service.v1.MoveToNextRoomRequest
+	(*MoveToNextRoomResponse)(nil), // 3: game.service.v1.MoveToNextRoomResponse
+	(*models.GameState)(nil),       // 4: game.models.v1.GameState
 }
 var file_game_api_game_proto_depIdxs = []int32{
-	8,  // 0: game.service.v1.GetGameSessionsByIDsResponse.game_sessions:type_name -> game.models.v1.GameSessionModel
-	9,  // 1: game.service.v1.UpsertGameSessionsRequest.game_sessions:type_name -> game.models.v1.GameSessionUpsertModel
-	10, // 2: game.service.v1.GetGameStatesByIDsResponse.game_states:type_name -> game.models.v1.GameStateModel
-	11, // 3: game.service.v1.UpsertGameStatesRequest.game_states:type_name -> game.models.v1.GameStateUpsertModel
-	0,  // 4: game.service.v1.GameService.GetGameSessionsByIDs:input_type -> game.service.v1.GetGameSessionsByIDsRequest
-	2,  // 5: game.service.v1.GameService.UpsertGameSessions:input_type -> game.service.v1.UpsertGameSessionsRequest
-	4,  // 6: game.service.v1.GameService.GetGameStatesByIDs:input_type -> game.service.v1.GetGameStatesByIDsRequest
-	6,  // 7: game.service.v1.GameService.UpsertGameStates:input_type -> game.service.v1.UpsertGameStatesRequest
-	1,  // 8: game.service.v1.GameService.GetGameSessionsByIDs:output_type -> game.service.v1.GetGameSessionsByIDsResponse
-	3,  // 9: game.service.v1.GameService.UpsertGameSessions:output_type -> game.service.v1.UpsertGameSessionsResponse
-	5,  // 10: game.service.v1.GameService.GetGameStatesByIDs:output_type -> game.service.v1.GetGameStatesByIDsResponse
-	7,  // 11: game.service.v1.GameService.UpsertGameStates:output_type -> game.service.v1.UpsertGameStatesResponse
-	8,  // [8:12] is the sub-list for method output_type
-	4,  // [4:8] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	4, // 0: game.service.v1.GetGameStateResponse.game_state:type_name -> game.models.v1.GameState
+	4, // 1: game.service.v1.MoveToNextRoomResponse.new_game_state:type_name -> game.models.v1.GameState
+	0, // 2: game.service.v1.GameService.GetGameState:input_type -> game.service.v1.GetGameStateRequest
+	2, // 3: game.service.v1.GameService.MoveToNextRoom:input_type -> game.service.v1.MoveToNextRoomRequest
+	1, // 4: game.service.v1.GameService.GetGameState:output_type -> game.service.v1.GetGameStateResponse
+	3, // 5: game.service.v1.GameService.MoveToNextRoom:output_type -> game.service.v1.MoveToNextRoomResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_game_api_game_proto_init() }
@@ -446,7 +263,7 @@ func file_game_api_game_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_api_game_proto_rawDesc), len(file_game_api_game_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

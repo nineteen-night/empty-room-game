@@ -16,15 +16,14 @@
     "application/json"
   ],
   "paths": {
-    "/partnerships/get-by-ids": {
+    "/auth/login": {
       "post": {
-        "summary": "Партнёрства",
-        "operationId": "AuthService_GetPartnershipsByIDs",
+        "operationId": "AuthService_Login",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetPartnershipsByIDsResponse"
+              "$ref": "#/definitions/v1LoginResponse"
             }
           },
           "default": {
@@ -40,7 +39,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1GetPartnershipsByIDsRequest"
+              "$ref": "#/definitions/v1LoginRequest"
             }
           }
         ],
@@ -49,14 +48,15 @@
         ]
       }
     },
-    "/partnerships/upsert": {
+    "/auth/register": {
       "post": {
-        "operationId": "AuthService_UpsertPartnerships",
+        "summary": "Регистрация и вход",
+        "operationId": "AuthService_Register",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpsertPartnershipsResponse"
+              "$ref": "#/definitions/v1RegisterResponse"
             }
           },
           "default": {
@@ -72,7 +72,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1UpsertPartnershipsRequest"
+              "$ref": "#/definitions/v1RegisterRequest"
             }
           }
         ],
@@ -81,15 +81,15 @@
         ]
       }
     },
-    "/users/get-by-ids": {
+    "/partnership": {
       "post": {
-        "summary": "Пользователи",
-        "operationId": "AuthService_GetUsersByIDs",
+        "summary": "Управление партнёрствами",
+        "operationId": "AuthService_CreatePartnership",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetUsersByIDsResponse"
+              "$ref": "#/definitions/v1CreatePartnershipResponse"
             }
           },
           "default": {
@@ -105,7 +105,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1GetUsersByIDsRequest"
+              "$ref": "#/definitions/v1CreatePartnershipRequest"
             }
           }
         ],
@@ -114,14 +114,14 @@
         ]
       }
     },
-    "/users/upsert": {
-      "post": {
-        "operationId": "AuthService_UpsertUsers",
+    "/partnership/{partnershipId}": {
+      "delete": {
+        "operationId": "AuthService_TerminatePartnership",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpsertUsersResponse"
+              "$ref": "#/definitions/v1TerminatePartnershipResponse"
             }
           },
           "default": {
@@ -133,12 +133,41 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "partnershipId",
+            "in": "path",
             "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/user/{userId}": {
+      "get": {
+        "summary": "Получение информации о пользователе",
+        "operationId": "AuthService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpsertUsersRequest"
+              "$ref": "#/definitions/v1GetUserResponse"
             }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -176,138 +205,70 @@
         }
       }
     },
-    "v1GetPartnershipsByIDsRequest": {
+    "v1CreatePartnershipRequest": {
       "type": "object",
       "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uint64"
-          }
-        }
-      },
-      "title": "Запросы для партнёрств"
-    },
-    "v1GetPartnershipsByIDsResponse": {
-      "type": "object",
-      "properties": {
-        "partnerships": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1PartnershipModel"
-          }
-        }
-      }
-    },
-    "v1GetUsersByIDsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uint64"
-          }
-        }
-      },
-      "title": "Запросы для пользователей"
-    },
-    "v1GetUsersByIDsResponse": {
-      "type": "object",
-      "properties": {
-        "users": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1UserModel"
-          }
-        }
-      }
-    },
-    "v1PartnershipModel": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uint64"
+        "userId": {
+          "type": "string"
         },
-        "player1Id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "player2Id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "status": {
+        "partnerUsername": {
           "type": "string"
         }
-      }
+      },
+      "title": "Партнёрства"
     },
-    "v1PartnershipUpsertModel": {
+    "v1CreatePartnershipResponse": {
       "type": "object",
       "properties": {
-        "player1Id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "player2Id": {
-          "type": "string",
-          "format": "uint64"
+        "partnership": {
+          "$ref": "#/definitions/v1Partnership"
         }
       }
     },
-    "v1UpsertPartnershipsRequest": {
+    "v1GetUserResponse": {
       "type": "object",
       "properties": {
-        "partnerships": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1PartnershipUpsertModel"
-          }
+        "user": {
+          "$ref": "#/definitions/v1User"
         }
       }
     },
-    "v1UpsertPartnershipsResponse": {
-      "type": "object"
-    },
-    "v1UpsertUsersRequest": {
+    "v1LoginRequest": {
       "type": "object",
       "properties": {
-        "users": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1UserUpsertModel"
-          }
-        }
-      }
-    },
-    "v1UpsertUsersResponse": {
-      "type": "object"
-    },
-    "v1UserModel": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uint64"
-        },
         "username": {
           "type": "string"
         },
-        "email": {
+        "password": {
           "type": "string"
-        },
-        "passwordHash": {
-          "type": "string"
+        }
+      },
+      "title": "Вход"
+    },
+    "v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User"
         }
       }
     },
-    "v1UserUpsertModel": {
+    "v1Partnership": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user1Id": {
+          "type": "string"
+        },
+        "user2Id": {
+          "type": "string"
+        }
+      },
+      "title": "Модель партнёрства"
+    },
+    "v1RegisterRequest": {
       "type": "object",
       "properties": {
         "username": {
@@ -319,7 +280,46 @@
         "password": {
           "type": "string"
         }
+      },
+      "title": "Регистрация"
+    },
+    "v1RegisterResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User"
+        }
       }
+    },
+    "v1TerminatePartnershipResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "passwordHash": {
+          "type": "string"
+        },
+        "maxRoomReached": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Модель пользователя"
     }
   }
 }

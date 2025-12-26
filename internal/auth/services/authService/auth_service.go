@@ -2,19 +2,33 @@ package authService
 
 import (
     "context"
+    
     "github.com/nineteen-night/empty-room-game/internal/auth/models"
 )
 
 type AuthStorage interface {
-    GetUsersByIDs(ctx context.Context, ids []uint64) ([]*models.User, error)
-    UpsertUsers(ctx context.Context, users []*models.User) error
-    GetPartnershipsByIDs(ctx context.Context, ids []uint64) ([]*models.Partnership, error)
-    UpsertPartnerships(ctx context.Context, partnerships []*models.Partnership) error
+    CreateUser(ctx context.Context, user *models.User) (string, error)
+    GetUserByID(ctx context.Context, userID string) (*models.User, error)
     GetUserByUsername(ctx context.Context, username string) (*models.User, error)
+    UpdateUserMaxRoom(ctx context.Context, userID string, roomNumber int32) (bool, error)
+    
+    CreatePartnership(ctx context.Context, user1ID, user2ID string) (string, error)
+    GetPartnershipByID(ctx context.Context, partnershipID string) (*models.Partnership, error)
+    GetPartnershipBetweenUsers(ctx context.Context, user1ID, user2ID string) (*models.Partnership, error) // ← ДОБАВИТЬ
+    TerminatePartnership(ctx context.Context, partnershipID string) error
+    
+    HashPassword(password string) (string, error)
+    CheckPasswordHash(password, hash string) bool
+}
+
+type EventSender interface {
+    SendPartnershipCreated(ctx context.Context, partnershipID, user1ID, user2ID string) error
+    SendPartnershipTerminated(ctx context.Context, partnershipID string) error
 }
 
 type AuthService struct {
     authStorage AuthStorage
+    eventSender EventSender
     minNameLen  int
     maxNameLen  int
 }
@@ -22,7 +36,12 @@ type AuthService struct {
 func NewAuthService(ctx context.Context, authStorage AuthStorage, minNameLen, maxNameLen int) *AuthService {
     return &AuthService{
         authStorage: authStorage,
+        eventSender: nil,
         minNameLen:  minNameLen,
         maxNameLen:  maxNameLen,
     }
+}
+
+func (s *AuthService) SetEventSender(eventSender EventSender) {
+    s.eventSender = eventSender
 }

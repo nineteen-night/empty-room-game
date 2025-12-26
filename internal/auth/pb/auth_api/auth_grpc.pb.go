@@ -19,22 +19,25 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_GetUsersByIDs_FullMethodName        = "/auth.service.v1.AuthService/GetUsersByIDs"
-	AuthService_UpsertUsers_FullMethodName          = "/auth.service.v1.AuthService/UpsertUsers"
-	AuthService_GetPartnershipsByIDs_FullMethodName = "/auth.service.v1.AuthService/GetPartnershipsByIDs"
-	AuthService_UpsertPartnerships_FullMethodName   = "/auth.service.v1.AuthService/UpsertPartnerships"
+	AuthService_Register_FullMethodName             = "/auth.service.v1.AuthService/Register"
+	AuthService_Login_FullMethodName                = "/auth.service.v1.AuthService/Login"
+	AuthService_CreatePartnership_FullMethodName    = "/auth.service.v1.AuthService/CreatePartnership"
+	AuthService_TerminatePartnership_FullMethodName = "/auth.service.v1.AuthService/TerminatePartnership"
+	AuthService_GetUser_FullMethodName              = "/auth.service.v1.AuthService/GetUser"
 )
 
 // AuthServiceClient is the client API for AuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
-	// Пользователи
-	GetUsersByIDs(ctx context.Context, in *GetUsersByIDsRequest, opts ...grpc.CallOption) (*GetUsersByIDsResponse, error)
-	UpsertUsers(ctx context.Context, in *UpsertUsersRequest, opts ...grpc.CallOption) (*UpsertUsersResponse, error)
-	// Партнёрства
-	GetPartnershipsByIDs(ctx context.Context, in *GetPartnershipsByIDsRequest, opts ...grpc.CallOption) (*GetPartnershipsByIDsResponse, error)
-	UpsertPartnerships(ctx context.Context, in *UpsertPartnershipsRequest, opts ...grpc.CallOption) (*UpsertPartnershipsResponse, error)
+	// Регистрация и вход
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	// Управление партнёрствами
+	CreatePartnership(ctx context.Context, in *CreatePartnershipRequest, opts ...grpc.CallOption) (*CreatePartnershipResponse, error)
+	TerminatePartnership(ctx context.Context, in *TerminatePartnershipRequest, opts ...grpc.CallOption) (*TerminatePartnershipResponse, error)
+	// Получение информации о пользователе
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 }
 
 type authServiceClient struct {
@@ -45,40 +48,50 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) GetUsersByIDs(ctx context.Context, in *GetUsersByIDsRequest, opts ...grpc.CallOption) (*GetUsersByIDsResponse, error) {
+func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUsersByIDsResponse)
-	err := c.cc.Invoke(ctx, AuthService_GetUsersByIDs_FullMethodName, in, out, cOpts...)
+	out := new(RegisterResponse)
+	err := c.cc.Invoke(ctx, AuthService_Register_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) UpsertUsers(ctx context.Context, in *UpsertUsersRequest, opts ...grpc.CallOption) (*UpsertUsersResponse, error) {
+func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpsertUsersResponse)
-	err := c.cc.Invoke(ctx, AuthService_UpsertUsers_FullMethodName, in, out, cOpts...)
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, AuthService_Login_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) GetPartnershipsByIDs(ctx context.Context, in *GetPartnershipsByIDsRequest, opts ...grpc.CallOption) (*GetPartnershipsByIDsResponse, error) {
+func (c *authServiceClient) CreatePartnership(ctx context.Context, in *CreatePartnershipRequest, opts ...grpc.CallOption) (*CreatePartnershipResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPartnershipsByIDsResponse)
-	err := c.cc.Invoke(ctx, AuthService_GetPartnershipsByIDs_FullMethodName, in, out, cOpts...)
+	out := new(CreatePartnershipResponse)
+	err := c.cc.Invoke(ctx, AuthService_CreatePartnership_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) UpsertPartnerships(ctx context.Context, in *UpsertPartnershipsRequest, opts ...grpc.CallOption) (*UpsertPartnershipsResponse, error) {
+func (c *authServiceClient) TerminatePartnership(ctx context.Context, in *TerminatePartnershipRequest, opts ...grpc.CallOption) (*TerminatePartnershipResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpsertPartnershipsResponse)
-	err := c.cc.Invoke(ctx, AuthService_UpsertPartnerships_FullMethodName, in, out, cOpts...)
+	out := new(TerminatePartnershipResponse)
+	err := c.cc.Invoke(ctx, AuthService_TerminatePartnership_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +102,14 @@ func (c *authServiceClient) UpsertPartnerships(ctx context.Context, in *UpsertPa
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 type AuthServiceServer interface {
-	// Пользователи
-	GetUsersByIDs(context.Context, *GetUsersByIDsRequest) (*GetUsersByIDsResponse, error)
-	UpsertUsers(context.Context, *UpsertUsersRequest) (*UpsertUsersResponse, error)
-	// Партнёрства
-	GetPartnershipsByIDs(context.Context, *GetPartnershipsByIDsRequest) (*GetPartnershipsByIDsResponse, error)
-	UpsertPartnerships(context.Context, *UpsertPartnershipsRequest) (*UpsertPartnershipsResponse, error)
+	// Регистрация и вход
+	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	// Управление партнёрствами
+	CreatePartnership(context.Context, *CreatePartnershipRequest) (*CreatePartnershipResponse, error)
+	TerminatePartnership(context.Context, *TerminatePartnershipRequest) (*TerminatePartnershipResponse, error)
+	// Получение информации о пользователе
+	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -105,17 +120,20 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) GetUsersByIDs(context.Context, *GetUsersByIDsRequest) (*GetUsersByIDsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetUsersByIDs not implemented")
+func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedAuthServiceServer) UpsertUsers(context.Context, *UpsertUsersRequest) (*UpsertUsersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpsertUsers not implemented")
+func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServiceServer) GetPartnershipsByIDs(context.Context, *GetPartnershipsByIDsRequest) (*GetPartnershipsByIDsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetPartnershipsByIDs not implemented")
+func (UnimplementedAuthServiceServer) CreatePartnership(context.Context, *CreatePartnershipRequest) (*CreatePartnershipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreatePartnership not implemented")
 }
-func (UnimplementedAuthServiceServer) UpsertPartnerships(context.Context, *UpsertPartnershipsRequest) (*UpsertPartnershipsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpsertPartnerships not implemented")
+func (UnimplementedAuthServiceServer) TerminatePartnership(context.Context, *TerminatePartnershipRequest) (*TerminatePartnershipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TerminatePartnership not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -138,74 +156,92 @@ func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
 	s.RegisterService(&AuthService_ServiceDesc, srv)
 }
 
-func _AuthService_GetUsersByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUsersByIDsRequest)
+func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GetUsersByIDs(ctx, in)
+		return srv.(AuthServiceServer).Register(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_GetUsersByIDs_FullMethodName,
+		FullMethod: AuthService_Register_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetUsersByIDs(ctx, req.(*GetUsersByIDsRequest))
+		return srv.(AuthServiceServer).Register(ctx, req.(*RegisterRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_UpsertUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertUsersRequest)
+func _AuthService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).UpsertUsers(ctx, in)
+		return srv.(AuthServiceServer).Login(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_UpsertUsers_FullMethodName,
+		FullMethod: AuthService_Login_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).UpsertUsers(ctx, req.(*UpsertUsersRequest))
+		return srv.(AuthServiceServer).Login(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GetPartnershipsByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPartnershipsByIDsRequest)
+func _AuthService_CreatePartnership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePartnershipRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GetPartnershipsByIDs(ctx, in)
+		return srv.(AuthServiceServer).CreatePartnership(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_GetPartnershipsByIDs_FullMethodName,
+		FullMethod: AuthService_CreatePartnership_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetPartnershipsByIDs(ctx, req.(*GetPartnershipsByIDsRequest))
+		return srv.(AuthServiceServer).CreatePartnership(ctx, req.(*CreatePartnershipRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_UpsertPartnerships_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertPartnershipsRequest)
+func _AuthService_TerminatePartnership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TerminatePartnershipRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).UpsertPartnerships(ctx, in)
+		return srv.(AuthServiceServer).TerminatePartnership(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_UpsertPartnerships_FullMethodName,
+		FullMethod: AuthService_TerminatePartnership_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).UpsertPartnerships(ctx, req.(*UpsertPartnershipsRequest))
+		return srv.(AuthServiceServer).TerminatePartnership(ctx, req.(*TerminatePartnershipRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUser(ctx, req.(*GetUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -218,20 +254,24 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetUsersByIDs",
-			Handler:    _AuthService_GetUsersByIDs_Handler,
+			MethodName: "Register",
+			Handler:    _AuthService_Register_Handler,
 		},
 		{
-			MethodName: "UpsertUsers",
-			Handler:    _AuthService_UpsertUsers_Handler,
+			MethodName: "Login",
+			Handler:    _AuthService_Login_Handler,
 		},
 		{
-			MethodName: "GetPartnershipsByIDs",
-			Handler:    _AuthService_GetPartnershipsByIDs_Handler,
+			MethodName: "CreatePartnership",
+			Handler:    _AuthService_CreatePartnership_Handler,
 		},
 		{
-			MethodName: "UpsertPartnerships",
-			Handler:    _AuthService_UpsertPartnerships_Handler,
+			MethodName: "TerminatePartnership",
+			Handler:    _AuthService_TerminatePartnership_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _AuthService_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

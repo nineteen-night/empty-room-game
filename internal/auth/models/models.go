@@ -1,16 +1,16 @@
 package models
 
 type User struct {
-    ID           uint64
-    Username     string
-    Email        string
-    Password     string
-    PasswordHash string
+    ID              string
+    Username        string
+    Email           string
+    Password        string
+    PasswordHash    string
+    MaxRoomReached  int32
 }
 
 type Partnership struct {
-    ID        uint64
-    Player1ID uint64
-    Player2ID uint64
-    Status    string
+    ID       string
+    User1ID  string
+    User2ID  string
 }

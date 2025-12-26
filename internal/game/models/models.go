@@ -1,17 +1,19 @@
 package models
 
+type Room struct {
+	RoomNumber  int32
+	Name        string
+	Description string
+}
+
 type GameSession struct {
-    ID              uint64
-    PartnershipID   uint64
-    CurrentRoom     string
-    Status          string 
-    CurrentPlayerID uint64
+	PartnershipID string
+	User1ID       string
+	User2ID       string
+	CurrentRoom   int32
 }
 
 type GameState struct {
-    ID            uint64
-    GameSessionID uint64
-    Inventory     string 
-    PuzzlesSolved string 
-    CurrentRoomID uint64
+	CurrentRoom int32
+	RoomInfo    *Room
 }

@@ -29,12 +29,10 @@ type DatabaseInstance struct {
 }
 
 type KafkaConfig struct {
-    Host                  string `yaml:"host"`
-    Port                  int    `yaml:"port"`
-    UsersUpsertTopic      string `yaml:"users_upsert_topic"`
-    PartnershipsUpsertTopic string `yaml:"partnerships_upsert_topic"`
-    GameSessionsUpsertTopic string `yaml:"game_sessions_upsert_topic"`
-    GameStatesUpsertTopic   string `yaml:"game_states_upsert_topic"`
+    Host                     string `yaml:"host"`
+    Port                     int    `yaml:"port"`
+    PartnershipEventsTopic   string `yaml:"partnership_events_topic"`
+    RoomCompletedEventsTopic string `yaml:"room_completed_events_topic"`
 }
 
 type ServiceSettings struct {

@@ -18,10 +18,8 @@ database:
 kafka:
   host: "localhost"
   port: 9092
-  users_upsert_topic: "users_upsert"
-  partnerships_upsert_topic: "partnerships_upsert"
-  game_sessions_upsert_topic: "game_sessions_upsert" 
-  game_states_upsert_topic: "game_states_upsert" 
+  partnership_events_topic: "partnership_events"
+  room_completed_events_topic: "room_completed_events"
 
 AuthServiceSettings:
   http_port: 8080

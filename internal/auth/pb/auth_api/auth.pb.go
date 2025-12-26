@@ -23,28 +23,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Запросы для пользователей
-type GetUsersByIDsRequest struct {
+// Регистрация
+type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUsersByIDsRequest) Reset() {
-	*x = GetUsersByIDsRequest{}
+func (x *RegisterRequest) Reset() {
+	*x = RegisterRequest{}
 	mi := &file_auth_api_auth_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUsersByIDsRequest) String() string {
+func (x *RegisterRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUsersByIDsRequest) ProtoMessage() {}
+func (*RegisterRequest) ProtoMessage() {}
 
-func (x *GetUsersByIDsRequest) ProtoReflect() protoreflect.Message {
+func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,39 +58,53 @@ func (x *GetUsersByIDsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUsersByIDsRequest.ProtoReflect.Descriptor instead.
-func (*GetUsersByIDsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
+func (*RegisterRequest) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetUsersByIDsRequest) GetIds() []uint64 {
+func (x *RegisterRequest) GetUsername() string {
 	if x != nil {
-		return x.Ids
+		return x.Username
 	}
-	return nil
+	return ""
 }
 
-type GetUsersByIDsResponse struct {
+func (x *RegisterRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Users         []*models.UserModel    `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	User          *models.User           `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUsersByIDsResponse) Reset() {
-	*x = GetUsersByIDsResponse{}
+func (x *RegisterResponse) Reset() {
+	*x = RegisterResponse{}
 	mi := &file_auth_api_auth_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUsersByIDsResponse) String() string {
+func (x *RegisterResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUsersByIDsResponse) ProtoMessage() {}
+func (*RegisterResponse) ProtoMessage() {}
 
-func (x *GetUsersByIDsResponse) ProtoReflect() protoreflect.Message {
+func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -100,39 +116,41 @@ func (x *GetUsersByIDsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUsersByIDsResponse.ProtoReflect.Descriptor instead.
-func (*GetUsersByIDsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
+func (*RegisterResponse) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetUsersByIDsResponse) GetUsers() []*models.UserModel {
+func (x *RegisterResponse) GetUser() *models.User {
 	if x != nil {
-		return x.Users
+		return x.User
 	}
 	return nil
 }
 
-type UpsertUsersRequest struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Users         []*models.UserUpsertModel `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+// Вход
+type LoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertUsersRequest) Reset() {
-	*x = UpsertUsersRequest{}
+func (x *LoginRequest) Reset() {
+	*x = LoginRequest{}
 	mi := &file_auth_api_auth_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertUsersRequest) String() string {
+func (x *LoginRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertUsersRequest) ProtoMessage() {}
+func (*LoginRequest) ProtoMessage() {}
 
-func (x *UpsertUsersRequest) ProtoReflect() protoreflect.Message {
+func (x *LoginRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -144,38 +162,46 @@ func (x *UpsertUsersRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertUsersRequest.ProtoReflect.Descriptor instead.
-func (*UpsertUsersRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use LoginRequest.ProtoReflect.Descriptor instead.
+func (*LoginRequest) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UpsertUsersRequest) GetUsers() []*models.UserUpsertModel {
+func (x *LoginRequest) GetUsername() string {
 	if x != nil {
-		return x.Users
+		return x.Username
 	}
-	return nil
+	return ""
 }
 
-type UpsertUsersResponse struct {
+func (x *LoginRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *models.User           `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertUsersResponse) Reset() {
-	*x = UpsertUsersResponse{}
+func (x *LoginResponse) Reset() {
+	*x = LoginResponse{}
 	mi := &file_auth_api_auth_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertUsersResponse) String() string {
+func (x *LoginResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertUsersResponse) ProtoMessage() {}
+func (*LoginResponse) ProtoMessage() {}
 
-func (x *UpsertUsersResponse) ProtoReflect() protoreflect.Message {
+func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -187,33 +213,41 @@ func (x *UpsertUsersResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertUsersResponse.ProtoReflect.Descriptor instead.
-func (*UpsertUsersResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
+func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{3}
 }
 
-// Запросы для партнёрств
-type GetPartnershipsByIDsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []uint64               `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+func (x *LoginResponse) GetUser() *models.User {
+	if x != nil {
+		return x.User
+	}
+	return nil
 }
 
-func (x *GetPartnershipsByIDsRequest) Reset() {
-	*x = GetPartnershipsByIDsRequest{}
+// Партнёрства
+type CreatePartnershipRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserId          string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	PartnerUsername string                 `protobuf:"bytes,2,opt,name=partner_username,json=partnerUsername,proto3" json:"partner_username,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CreatePartnershipRequest) Reset() {
+	*x = CreatePartnershipRequest{}
 	mi := &file_auth_api_auth_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPartnershipsByIDsRequest) String() string {
+func (x *CreatePartnershipRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPartnershipsByIDsRequest) ProtoMessage() {}
+func (*CreatePartnershipRequest) ProtoMessage() {}
 
-func (x *GetPartnershipsByIDsRequest) ProtoReflect() protoreflect.Message {
+func (x *CreatePartnershipRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -225,39 +259,46 @@ func (x *GetPartnershipsByIDsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPartnershipsByIDsRequest.ProtoReflect.Descriptor instead.
-func (*GetPartnershipsByIDsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreatePartnershipRequest.ProtoReflect.Descriptor instead.
+func (*CreatePartnershipRequest) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetPartnershipsByIDsRequest) GetIds() []uint64 {
+func (x *CreatePartnershipRequest) GetUserId() string {
 	if x != nil {
-		return x.Ids
+		return x.UserId
 	}
-	return nil
+	return ""
 }
 
-type GetPartnershipsByIDsResponse struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	Partnerships  []*models.PartnershipModel `protobuf:"bytes,1,rep,name=partnerships,proto3" json:"partnerships,omitempty"`
+func (x *CreatePartnershipRequest) GetPartnerUsername() string {
+	if x != nil {
+		return x.PartnerUsername
+	}
+	return ""
+}
+
+type CreatePartnershipResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Partnership   *models.Partnership    `protobuf:"bytes,1,opt,name=partnership,proto3" json:"partnership,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetPartnershipsByIDsResponse) Reset() {
-	*x = GetPartnershipsByIDsResponse{}
+func (x *CreatePartnershipResponse) Reset() {
+	*x = CreatePartnershipResponse{}
 	mi := &file_auth_api_auth_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetPartnershipsByIDsResponse) String() string {
+func (x *CreatePartnershipResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetPartnershipsByIDsResponse) ProtoMessage() {}
+func (*CreatePartnershipResponse) ProtoMessage() {}
 
-func (x *GetPartnershipsByIDsResponse) ProtoReflect() protoreflect.Message {
+func (x *CreatePartnershipResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -269,39 +310,39 @@ func (x *GetPartnershipsByIDsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetPartnershipsByIDsResponse.ProtoReflect.Descriptor instead.
-func (*GetPartnershipsByIDsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreatePartnershipResponse.ProtoReflect.Descriptor instead.
+func (*CreatePartnershipResponse) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *GetPartnershipsByIDsResponse) GetPartnerships() []*models.PartnershipModel {
+func (x *CreatePartnershipResponse) GetPartnership() *models.Partnership {
 	if x != nil {
-		return x.Partnerships
+		return x.Partnership
 	}
 	return nil
 }
 
-type UpsertPartnershipsRequest struct {
-	state         protoimpl.MessageState           `protogen:"open.v1"`
-	Partnerships  []*models.PartnershipUpsertModel `protobuf:"bytes,1,rep,name=partnerships,proto3" json:"partnerships,omitempty"`
+type TerminatePartnershipRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PartnershipId string                 `protobuf:"bytes,1,opt,name=partnership_id,json=partnershipId,proto3" json:"partnership_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertPartnershipsRequest) Reset() {
-	*x = UpsertPartnershipsRequest{}
+func (x *TerminatePartnershipRequest) Reset() {
+	*x = TerminatePartnershipRequest{}
 	mi := &file_auth_api_auth_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertPartnershipsRequest) String() string {
+func (x *TerminatePartnershipRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertPartnershipsRequest) ProtoMessage() {}
+func (*TerminatePartnershipRequest) ProtoMessage() {}
 
-func (x *UpsertPartnershipsRequest) ProtoReflect() protoreflect.Message {
+func (x *TerminatePartnershipRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -313,38 +354,39 @@ func (x *UpsertPartnershipsRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertPartnershipsRequest.ProtoReflect.Descriptor instead.
-func (*UpsertPartnershipsRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use TerminatePartnershipRequest.ProtoReflect.Descriptor instead.
+func (*TerminatePartnershipRequest) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UpsertPartnershipsRequest) GetPartnerships() []*models.PartnershipUpsertModel {
+func (x *TerminatePartnershipRequest) GetPartnershipId() string {
 	if x != nil {
-		return x.Partnerships
+		return x.PartnershipId
 	}
-	return nil
+	return ""
 }
 
-type UpsertPartnershipsResponse struct {
+type TerminatePartnershipResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpsertPartnershipsResponse) Reset() {
-	*x = UpsertPartnershipsResponse{}
+func (x *TerminatePartnershipResponse) Reset() {
+	*x = TerminatePartnershipResponse{}
 	mi := &file_auth_api_auth_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpsertPartnershipsResponse) String() string {
+func (x *TerminatePartnershipResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpsertPartnershipsResponse) ProtoMessage() {}
+func (*TerminatePartnershipResponse) ProtoMessage() {}
 
-func (x *UpsertPartnershipsResponse) ProtoReflect() protoreflect.Message {
+func (x *TerminatePartnershipResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_auth_api_auth_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -356,35 +398,142 @@ func (x *UpsertPartnershipsResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpsertPartnershipsResponse.ProtoReflect.Descriptor instead.
-func (*UpsertPartnershipsResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use TerminatePartnershipResponse.ProtoReflect.Descriptor instead.
+func (*TerminatePartnershipResponse) Descriptor() ([]byte, []int) {
 	return file_auth_api_auth_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *TerminatePartnershipResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+// Пользователь
+type GetUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserRequest) Reset() {
+	*x = GetUserRequest{}
+	mi := &file_auth_api_auth_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserRequest) ProtoMessage() {}
+
+func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_api_auth_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
+func (*GetUserRequest) Descriptor() ([]byte, []int) {
+	return file_auth_api_auth_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetUserRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	User          *models.User           `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserResponse) Reset() {
+	*x = GetUserResponse{}
+	mi := &file_auth_api_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserResponse) ProtoMessage() {}
+
+func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_api_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
+func (*GetUserResponse) Descriptor() ([]byte, []int) {
+	return file_auth_api_auth_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetUserResponse) GetUser() *models.User {
+	if x != nil {
+		return x.User
+	}
+	return nil
 }
 
 var File_auth_api_auth_proto protoreflect.FileDescriptor
 
 const file_auth_api_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x13auth_api/auth.proto\x12\x0fauth.service.v1\x1a\x17models/auth_model.proto\x1a\x1cgoogle/api/annotations.proto\"(\n" +
-	"\x14GetUsersByIDsRequest\x12\x10\n" +
-	"\x03ids\x18\x01 \x03(\x04R\x03ids\"H\n" +
-	"\x15GetUsersByIDsResponse\x12/\n" +
-	"\x05users\x18\x01 \x03(\v2\x19.auth.models.v1.UserModelR\x05users\"K\n" +
-	"\x12UpsertUsersRequest\x125\n" +
-	"\x05users\x18\x01 \x03(\v2\x1f.auth.models.v1.UserUpsertModelR\x05users\"\x15\n" +
-	"\x13UpsertUsersResponse\"/\n" +
-	"\x1bGetPartnershipsByIDsRequest\x12\x10\n" +
-	"\x03ids\x18\x01 \x03(\x04R\x03ids\"d\n" +
-	"\x1cGetPartnershipsByIDsResponse\x12D\n" +
-	"\fpartnerships\x18\x01 \x03(\v2 .auth.models.v1.PartnershipModelR\fpartnerships\"g\n" +
-	"\x19UpsertPartnershipsRequest\x12J\n" +
-	"\fpartnerships\x18\x01 \x03(\v2&.auth.models.v1.PartnershipUpsertModelR\fpartnerships\"\x1c\n" +
-	"\x1aUpsertPartnershipsResponse2\xab\x04\n" +
-	"\vAuthService\x12|\n" +
-	"\rGetUsersByIDs\x12%.auth.service.v1.GetUsersByIDsRequest\x1a&.auth.service.v1.GetUsersByIDsResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/users/get-by-ids\x12r\n" +
-	"\vUpsertUsers\x12#.auth.service.v1.UpsertUsersRequest\x1a$.auth.service.v1.UpsertUsersResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/users/upsert\x12\x98\x01\n" +
-	"\x14GetPartnershipsByIDs\x12,.auth.service.v1.GetPartnershipsByIDsRequest\x1a-.auth.service.v1.GetPartnershipsByIDsResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/partnerships/get-by-ids\x12\x8e\x01\n" +
-	"\x12UpsertPartnerships\x12*.auth.service.v1.UpsertPartnershipsRequest\x1a+.auth.service.v1.UpsertPartnershipsResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/partnerships/upsertBEZCgithub.com/nineteen-night/empty-room-game/internal/auth/pb/auth_apib\x06proto3"
+	"\x13auth_api/auth.proto\x12\x0fauth.service.v1\x1a\x17models/auth_model.proto\x1a\x1cgoogle/api/annotations.proto\"_\n" +
+	"\x0fRegisterRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x03 \x01(\tR\bpassword\"<\n" +
+	"\x10RegisterResponse\x12(\n" +
+	"\x04user\x18\x01 \x01(\v2\x14.auth.models.v1.UserR\x04user\"F\n" +
+	"\fLoginRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"9\n" +
+	"\rLoginResponse\x12(\n" +
+	"\x04user\x18\x01 \x01(\v2\x14.auth.models.v1.UserR\x04user\"^\n" +
+	"\x18CreatePartnershipRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12)\n" +
+	"\x10partner_username\x18\x02 \x01(\tR\x0fpartnerUsername\"Z\n" +
+	"\x19CreatePartnershipResponse\x12=\n" +
+	"\vpartnership\x18\x01 \x01(\v2\x1b.auth.models.v1.PartnershipR\vpartnership\"D\n" +
+	"\x1bTerminatePartnershipRequest\x12%\n" +
+	"\x0epartnership_id\x18\x01 \x01(\tR\rpartnershipId\"8\n" +
+	"\x1cTerminatePartnershipResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\")\n" +
+	"\x0eGetUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\";\n" +
+	"\x0fGetUserResponse\x12(\n" +
+	"\x04user\x18\x01 \x01(\v2\x14.auth.models.v1.UserR\x04user2\xe3\x04\n" +
+	"\vAuthService\x12j\n" +
+	"\bRegister\x12 .auth.service.v1.RegisterRequest\x1a!.auth.service.v1.RegisterResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/auth/register\x12^\n" +
+	"\x05Login\x12\x1d.auth.service.v1.LoginRequest\x1a\x1e.auth.service.v1.LoginResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/auth/login\x12\x83\x01\n" +
+	"\x11CreatePartnership\x12).auth.service.v1.CreatePartnershipRequest\x1a*.auth.service.v1.CreatePartnershipResponse\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/partnership\x12\x9a\x01\n" +
+	"\x14TerminatePartnership\x12,.auth.service.v1.TerminatePartnershipRequest\x1a-.auth.service.v1.TerminatePartnershipResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/partnership/{partnership_id}\x12e\n" +
+	"\aGetUser\x12\x1f.auth.service.v1.GetUserRequest\x1a .auth.service.v1.GetUserResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/user/{user_id}BEZCgithub.com/nineteen-night/empty-room-game/internal/auth/pb/auth_apib\x06proto3"
 
 var (
 	file_auth_api_auth_proto_rawDescOnce sync.Once
@@ -398,36 +547,38 @@ func file_auth_api_auth_proto_rawDescGZIP() []byte {
 	return file_auth_api_auth_proto_rawDescData
 }
 
-var file_auth_api_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_auth_api_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_auth_api_auth_proto_goTypes = []any{
-	(*GetUsersByIDsRequest)(nil),          // 0: auth.service.v1.GetUsersByIDsRequest
-	(*GetUsersByIDsResponse)(nil),         // 1: auth.service.v1.GetUsersByIDsResponse
-	(*UpsertUsersRequest)(nil),            // 2: auth.service.v1.UpsertUsersRequest
-	(*UpsertUsersResponse)(nil),           // 3: auth.service.v1.UpsertUsersResponse
-	(*GetPartnershipsByIDsRequest)(nil),   // 4: auth.service.v1.GetPartnershipsByIDsRequest
-	(*GetPartnershipsByIDsResponse)(nil),  // 5: auth.service.v1.GetPartnershipsByIDsResponse
-	(*UpsertPartnershipsRequest)(nil),     // 6: auth.service.v1.UpsertPartnershipsRequest
-	(*UpsertPartnershipsResponse)(nil),    // 7: auth.service.v1.UpsertPartnershipsResponse
-	(*models.UserModel)(nil),              // 8: auth.models.v1.UserModel
-	(*models.UserUpsertModel)(nil),        // 9: auth.models.v1.UserUpsertModel
-	(*models.PartnershipModel)(nil),       // 10: auth.models.v1.PartnershipModel
-	(*models.PartnershipUpsertModel)(nil), // 11: auth.models.v1.PartnershipUpsertModel
+	(*RegisterRequest)(nil),              // 0: auth.service.v1.RegisterRequest
+	(*RegisterResponse)(nil),             // 1: auth.service.v1.RegisterResponse
+	(*LoginRequest)(nil),                 // 2: auth.service.v1.LoginRequest
+	(*LoginResponse)(nil),                // 3: auth.service.v1.LoginResponse
+	(*CreatePartnershipRequest)(nil),     // 4: auth.service.v1.CreatePartnershipRequest
+	(*CreatePartnershipResponse)(nil),    // 5: auth.service.v1.CreatePartnershipResponse
+	(*TerminatePartnershipRequest)(nil),  // 6: auth.service.v1.TerminatePartnershipRequest
+	(*TerminatePartnershipResponse)(nil), // 7: auth.service.v1.TerminatePartnershipResponse
+	(*GetUserRequest)(nil),               // 8: auth.service.v1.GetUserRequest
+	(*GetUserResponse)(nil),              // 9: auth.service.v1.GetUserResponse
+	(*models.User)(nil),                  // 10: auth.models.v1.User
+	(*models.Partnership)(nil),           // 11: auth.models.v1.Partnership
 }
 var file_auth_api_auth_proto_depIdxs = []int32{
-	8,  // 0: auth.service.v1.GetUsersByIDsResponse.users:type_name -> auth.models.v1.UserModel
-	9,  // 1: auth.service.v1.UpsertUsersRequest.users:type_name -> auth.models.v1.UserUpsertModel
-	10, // 2: auth.service.v1.GetPartnershipsByIDsResponse.partnerships:type_name -> auth.models.v1.PartnershipModel
-	11, // 3: auth.service.v1.UpsertPartnershipsRequest.partnerships:type_name -> auth.models.v1.PartnershipUpsertModel
-	0,  // 4: auth.service.v1.AuthService.GetUsersByIDs:input_type -> auth.service.v1.GetUsersByIDsRequest
-	2,  // 5: auth.service.v1.AuthService.UpsertUsers:input_type -> auth.service.v1.UpsertUsersRequest
-	4,  // 6: auth.service.v1.AuthService.GetPartnershipsByIDs:input_type -> auth.service.v1.GetPartnershipsByIDsRequest
-	6,  // 7: auth.service.v1.AuthService.UpsertPartnerships:input_type -> auth.service.v1.UpsertPartnershipsRequest
-	1,  // 8: auth.service.v1.AuthService.GetUsersByIDs:output_type -> auth.service.v1.GetUsersByIDsResponse
-	3,  // 9: auth.service.v1.AuthService.UpsertUsers:output_type -> auth.service.v1.UpsertUsersResponse
-	5,  // 10: auth.service.v1.AuthService.GetPartnershipsByIDs:output_type -> auth.service.v1.GetPartnershipsByIDsResponse
-	7,  // 11: auth.service.v1.AuthService.UpsertPartnerships:output_type -> auth.service.v1.UpsertPartnershipsResponse
-	8,  // [8:12] is the sub-list for method output_type
-	4,  // [4:8] is the sub-list for method input_type
+	10, // 0: auth.service.v1.RegisterResponse.user:type_name -> auth.models.v1.User
+	10, // 1: auth.service.v1.LoginResponse.user:type_name -> auth.models.v1.User
+	11, // 2: auth.service.v1.CreatePartnershipResponse.partnership:type_name -> auth.models.v1.Partnership
+	10, // 3: auth.service.v1.GetUserResponse.user:type_name -> auth.models.v1.User
+	0,  // 4: auth.service.v1.AuthService.Register:input_type -> auth.service.v1.RegisterRequest
+	2,  // 5: auth.service.v1.AuthService.Login:input_type -> auth.service.v1.LoginRequest
+	4,  // 6: auth.service.v1.AuthService.CreatePartnership:input_type -> auth.service.v1.CreatePartnershipRequest
+	6,  // 7: auth.service.v1.AuthService.TerminatePartnership:input_type -> auth.service.v1.TerminatePartnershipRequest
+	8,  // 8: auth.service.v1.AuthService.GetUser:input_type -> auth.service.v1.GetUserRequest
+	1,  // 9: auth.service.v1.AuthService.Register:output_type -> auth.service.v1.RegisterResponse
+	3,  // 10: auth.service.v1.AuthService.Login:output_type -> auth.service.v1.LoginResponse
+	5,  // 11: auth.service.v1.AuthService.CreatePartnership:output_type -> auth.service.v1.CreatePartnershipResponse
+	7,  // 12: auth.service.v1.AuthService.TerminatePartnership:output_type -> auth.service.v1.TerminatePartnershipResponse
+	9,  // 13: auth.service.v1.AuthService.GetUser:output_type -> auth.service.v1.GetUserResponse
+	9,  // [9:14] is the sub-list for method output_type
+	4,  // [4:9] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
@@ -444,7 +595,7 @@ func file_auth_api_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_api_auth_proto_rawDesc), len(file_auth_api_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

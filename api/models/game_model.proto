@@ -3,32 +3,20 @@ syntax = "proto3";
 package game.models.v1;
 option go_package = "github.com/nineteen-night/empty-room-game/internal/game/pb/models";
 
-message GameSessionModel {
-    uint64 id = 1;
-    uint64 partnership_id = 2;
-    string current_room = 3;
-    string status = 4;  // "active", "paused", "completed"
-    uint64 current_player_id = 5;
+message Room {
+    int32 room_number = 1;
+    string name = 2;
+    string description = 3;
 }
 
-message GameSessionUpsertModel {
-    uint64 partnership_id = 1;
-    string current_room = 2;
-    string status = 3;
-    uint64 current_player_id = 4;
+message GameSession {
+    string partnership_id = 1;
+    string user1_id = 2;
+    string user2_id = 3;
+    int32 current_room = 4;
 }
 
-message GameStateModel {
-    uint64 id = 1;
-    uint64 game_session_id = 2;
-    string inventory = 3;        // JSON
-    string puzzles_solved = 4;   // JSON
-    uint64 current_room_id = 5;
-}
-
-message GameStateUpsertModel {
-    uint64 game_session_id = 1;
-    string inventory = 2;        // JSON
-    string puzzles_solved = 3;   // JSON
-    uint64 current_room_id = 4;
+message GameState {
+    int32 current_room = 1;
+    Room room_info = 2;
 }

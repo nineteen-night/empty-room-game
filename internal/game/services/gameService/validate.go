@@ -1,54 +1,35 @@
 package gameService
 
 import (
-    "encoding/json" 
-    "errors"
-    "fmt"
-    "strings"
-
-    "github.com/nineteen-night/empty-room-game/internal/game/models"
+	"errors"
 )
 
-func (s *GameService) validateGameSessions(sessions []*models.GameSession) error {
-    for _, session := range sessions {
-        if session.PartnershipID == 0 {
-            return errors.New("partnership_id обязателен")
-        }
-
-        validStatuses := map[string]bool{
-            "active":    true,
-            "paused":    true,
-            "completed": true,
-        }
-
-        if !validStatuses[session.Status] {
-            return fmt.Errorf("некорректный статус: %s", session.Status)
-        }
-
-        if strings.TrimSpace(session.CurrentRoom) == "" {
-            return errors.New("current_room не может быть пустым")
-        }
-    }
-    return nil
+func (s *GameService) ValidatePartnershipID(partnershipID string) error {
+	if partnershipID == "" {
+		return errors.New("ID партнёрства не может быть пустым")
+	}
+	return nil
 }
 
-func (s *GameService) validateGameStates(states []*models.GameState) error {
-    for _, state := range states {
-        if state.GameSessionID == 0 {
-            return errors.New("game_session_id обязателен")
-        }
+func (s *GameService) ValidateGameSessionCreation(partnershipID, user1ID, user2ID string) error {
+	if partnershipID == "" {
+		return errors.New("ID партнёрства не может быть пустым")
+	}
 
-        if state.Inventory != "" && !isValidJSON(state.Inventory) {
-            return errors.New("inventory должен быть валидным JSON")
-        }
-        if state.PuzzlesSolved != "" && !isValidJSON(state.PuzzlesSolved) {
-            return errors.New("puzzles_solved должен быть валидным JSON")
-        }
-    }
-    return nil
+	if user1ID == "" || user2ID == "" {
+		return errors.New("ID пользователей не могут быть пустыми")
+	}
+
+	if user1ID == user2ID {
+		return errors.New("ID пользователей не могут совпадать")
+	}
+
+	return nil
 }
 
-func isValidJSON(str string) bool {
-    var js interface{}
-    return json.Unmarshal([]byte(str), &js) == nil
+func (s *GameService) ValidateRoomNumber(roomNumber int32) error {
+	if roomNumber < 1 {
+		return errors.New("номер комнаты должен быть положительным")
+	}
+	return nil
 }

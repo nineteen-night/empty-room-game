@@ -6,9 +6,14 @@ import (
     "log/slog"
     "time"
 
-    "github.com/nineteen-night/empty-room-game/internal/auth/models"
     "github.com/segmentio/kafka-go"
 )
+
+type RoomCompletedEvent struct {
+    EventType  string `json:"event_type"`
+    UserID     string `json:"user_id"`
+    RoomNumber int32  `json:"room_number"`
+}
 
 func (c *AuthConsumer) Consume(ctx context.Context) {
     r := kafka.NewReader(kafka.ReaderConfig{
@@ -27,22 +32,29 @@ func (c *AuthConsumer) Consume(ctx context.Context) {
             continue
         }
 
-        if c.topicName == "users_upsert" {
-            var user models.User
-            err = json.Unmarshal(msg.Value, &user)
+        if c.topicName == "room_completed_events" {
+            var event RoomCompletedEvent
+            err = json.Unmarshal(msg.Value, &event)
             if err != nil {
-                slog.Error("parse users error", "error", err)
+                slog.Error("parse room_completed error", "error", err)
                 continue
             }
-            err = c.authProcessor.HandleUsers(ctx, &user)
-        } else if c.topicName == "partnerships_upsert" {
-            var partnership models.Partnership
-            err = json.Unmarshal(msg.Value, &partnership)
-            if err != nil {
-                slog.Error("parse partnerships error", "error", err)
-                continue
+            
+            if event.EventType == "room_completed" {
+                slog.Info("Processing room_completed", 
+                    "user", event.UserID, 
+                    "room", event.RoomNumber)
+                
+                err = c.authProcessor.HandleRoomCompleted(ctx, event.UserID, event.RoomNumber)
+                if err != nil {
+                    slog.Error("Failed to handle room_completed", 
+                        "error", err, 
+                        "user", event.UserID)
+                } else {
+                    slog.Info("Successfully processed room_completed", 
+                        "user", event.UserID)
+                }
             }
-            err = c.authProcessor.HandlePartnerships(ctx, &partnership)
         }
 
         if err != nil {

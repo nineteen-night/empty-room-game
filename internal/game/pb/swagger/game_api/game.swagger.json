@@ -16,15 +16,15 @@
     "application/json"
   ],
   "paths": {
-    "/game-sessions/get-by-ids": {
+    "/game/{partnershipId}/move": {
       "post": {
-        "summary": "Игровые сессии",
-        "operationId": "GameService_GetGameSessionsByIDs",
+        "summary": "Переход в следующую комнату",
+        "operationId": "GameService_MoveToNextRoom",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetGameSessionsByIDsResponse"
+              "$ref": "#/definitions/v1MoveToNextRoomResponse"
             }
           },
           "default": {
@@ -36,11 +36,17 @@
         },
         "parameters": [
           {
+            "name": "partnershipId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1GetGameSessionsByIDsRequest"
+              "$ref": "#/definitions/GameServiceMoveToNextRoomBody"
             }
           }
         ],
@@ -49,14 +55,15 @@
         ]
       }
     },
-    "/game-sessions/upsert": {
-      "post": {
-        "operationId": "GameService_UpsertGameSessions",
+    "/game/{partnershipId}/state": {
+      "get": {
+        "summary": "Получение состояния игры",
+        "operationId": "GameService_GetGameState",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1UpsertGameSessionsResponse"
+              "$ref": "#/definitions/v1GetGameStateResponse"
             }
           },
           "default": {
@@ -68,77 +75,10 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
+            "name": "partnershipId",
+            "in": "path",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UpsertGameSessionsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "GameService"
-        ]
-      }
-    },
-    "/game-states/get-by-ids": {
-      "post": {
-        "summary": "Состояния игр",
-        "operationId": "GameService_GetGameStatesByIDs",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1GetGameStatesByIDsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1GetGameStatesByIDsRequest"
-            }
-          }
-        ],
-        "tags": [
-          "GameService"
-        ]
-      }
-    },
-    "/game-states/upsert": {
-      "post": {
-        "operationId": "GameService_UpsertGameStates",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UpsertGameStatesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UpsertGameStatesRequest"
-            }
+            "type": "string"
           }
         ],
         "tags": [
@@ -148,6 +88,9 @@
     }
   },
   "definitions": {
+    "GameServiceMoveToNextRoomBody": {
+      "type": "object"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -176,174 +119,50 @@
         }
       }
     },
-    "v1GameSessionModel": {
+    "v1GameState": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "partnershipId": {
-          "type": "string",
-          "format": "uint64"
-        },
         "currentRoom": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         },
-        "status": {
-          "type": "string",
-          "title": "\"active\", \"paused\", \"completed\""
-        },
-        "currentPlayerId": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GameSessionUpsertModel": {
-      "type": "object",
-      "properties": {
-        "partnershipId": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "currentRoom": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "currentPlayerId": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GameStateModel": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "gameSessionId": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "inventory": {
-          "type": "string",
-          "title": "JSON"
-        },
-        "puzzlesSolved": {
-          "type": "string",
-          "title": "JSON"
-        },
-        "currentRoomId": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GameStateUpsertModel": {
-      "type": "object",
-      "properties": {
-        "gameSessionId": {
-          "type": "string",
-          "format": "uint64"
-        },
-        "inventory": {
-          "type": "string",
-          "title": "JSON"
-        },
-        "puzzlesSolved": {
-          "type": "string",
-          "title": "JSON"
-        },
-        "currentRoomId": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
-    "v1GetGameSessionsByIDsRequest": {
-      "type": "object",
-      "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uint64"
-          }
+        "roomInfo": {
+          "$ref": "#/definitions/v1Room"
         }
       },
-      "title": "Запросы для игровых сессий"
+      "title": "Состояние игры"
     },
-    "v1GetGameSessionsByIDsResponse": {
+    "v1GetGameStateResponse": {
       "type": "object",
       "properties": {
-        "gameSessions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1GameSessionModel"
-          }
+        "gameState": {
+          "$ref": "#/definitions/v1GameState"
         }
       }
     },
-    "v1GetGameStatesByIDsRequest": {
+    "v1MoveToNextRoomResponse": {
       "type": "object",
       "properties": {
-        "ids": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "uint64"
-          }
+        "newGameState": {
+          "$ref": "#/definitions/v1GameState"
+        }
+      }
+    },
+    "v1Room": {
+      "type": "object",
+      "properties": {
+        "roomNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
         }
       },
-      "title": "Запросы для состояний игр"
-    },
-    "v1GetGameStatesByIDsResponse": {
-      "type": "object",
-      "properties": {
-        "gameStates": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1GameStateModel"
-          }
-        }
-      }
-    },
-    "v1UpsertGameSessionsRequest": {
-      "type": "object",
-      "properties": {
-        "gameSessions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1GameSessionUpsertModel"
-          }
-        }
-      }
-    },
-    "v1UpsertGameSessionsResponse": {
-      "type": "object"
-    },
-    "v1UpsertGameStatesRequest": {
-      "type": "object",
-      "properties": {
-        "gameStates": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1GameStateUpsertModel"
-          }
-        }
-      }
-    },
-    "v1UpsertGameStatesResponse": {
-      "type": "object"
+      "title": "Комната"
     }
   }
 }
