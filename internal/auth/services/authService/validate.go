@@ -63,23 +63,42 @@ func (s *AuthService) ValidatePartnershipTermination(partnershipID string) error
 
 // Проверка email
 func (s *AuthService) IsValidEmail(email string) bool {
-    if len(email) < 3 || len(email) > 254 {
-        return false
+	if len(email) < 3 || len(email) > 254 {
+		return false
+	}
+
+	_, err := mail.ParseAddress(email)
+	if err != nil {
+		return false
+	}
+
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false
+	}
+
+	// Проверяем длину local part (до @)
+	if len(parts[0]) == 0 || len(parts[0]) > 64 {
+		return false
+	}
+
+	// Проверяем длину domain part (после @)
+	if len(parts[1]) == 0 || len(parts[1]) > 253 {
+		return false
+	}
+
+	return true
+}
+
+// ValidateRoomCompletion - валидация завершения комнаты
+func (s *AuthService) ValidateRoomCompletion(userID string, roomNumber int32) error {
+    if userID == "" {
+        return errors.New("ID пользователя не может быть пустым")
     }
 
-    _, err := mail.ParseAddress(email)
-    if err != nil {
-        return false
+    if roomNumber < 1 {
+        return errors.New("номер комнаты должен быть положительным")
     }
 
-    parts := strings.Split(email, "@")
-    if len(parts) != 2 {
-        return false
-    }
-
-    if len(parts[1]) == 0 || len(parts[1]) > 253 {
-        return false
-    }
-
-    return true
+    return nil
 }

@@ -20,6 +20,10 @@ func (s *AuthService) GetUser(ctx context.Context, userID string) (*models.User,
 }
 
 func (s *AuthService) HandleRoomCompleted(ctx context.Context, userID string, roomNumber int32) error {
+    if err := s.ValidateRoomCompletion(userID, roomNumber); err != nil {
+		return err
+	}
+
     updated, err := s.authStorage.UpdateUserMaxRoom(ctx, userID, roomNumber)
     if err != nil {
         return fmt.Errorf("update max room error: %w", err)
