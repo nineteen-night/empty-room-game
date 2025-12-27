@@ -1,0 +1,1184 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>authService: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/auth_service.go (100.0%)</option>
+				
+				<option value="file1">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/login.go (90.0%)</option>
+				
+				<option value="file2">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/mocks/auth_storage_mock.go (0.0%)</option>
+				
+				<option value="file3">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/mocks/event_sender_mock.go (0.0%)</option>
+				
+				<option value="file4">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/partnership.go (89.7%)</option>
+				
+				<option value="file5">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/register.go (93.8%)</option>
+				
+				<option value="file6">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/user.go (100.0%)</option>
+				
+				<option value="file7">github.com/nineteen-night/empty-room-game/internal/auth/services/authService/validate.go (94.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package authService
+
+import (
+    "context"
+    
+    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+)
+
+type AuthStorage interface {
+    CreateUser(ctx context.Context, user *models.User) (string, error)
+    GetUserByID(ctx context.Context, userID string) (*models.User, error)
+    GetUserByUsername(ctx context.Context, username string) (*models.User, error)
+    UpdateUserMaxRoom(ctx context.Context, userID string, roomNumber int32) (bool, error)
+    
+    CreatePartnership(ctx context.Context, user1ID, user2ID string) (string, error)
+    GetPartnershipByID(ctx context.Context, partnershipID string) (*models.Partnership, error)
+    GetPartnershipBetweenUsers(ctx context.Context, user1ID, user2ID string) (*models.Partnership, error) // ← ДОБАВИТЬ
+    TerminatePartnership(ctx context.Context, partnershipID string) error
+    
+    HashPassword(password string) (string, error)
+    CheckPasswordHash(password, hash string) bool
+}
+
+type EventSender interface {
+    SendPartnershipCreated(ctx context.Context, partnershipID, user1ID, user2ID string) error
+    SendPartnershipTerminated(ctx context.Context, partnershipID string) error
+}
+
+type AuthService struct {
+    authStorage AuthStorage
+    eventSender EventSender
+    minNameLen  int
+    maxNameLen  int
+}
+
+func NewAuthService(ctx context.Context, authStorage AuthStorage, minNameLen, maxNameLen int) *AuthService <span class="cov8" title="1">{
+    return &amp;AuthService{
+        authStorage: authStorage,
+        eventSender: nil,
+        minNameLen:  minNameLen,
+        maxNameLen:  maxNameLen,
+    }
+}</span>
+
+func (s *AuthService) SetEventSender(eventSender EventSender) <span class="cov8" title="1">{
+    s.eventSender = eventSender
+}</pre>
+		
+		<pre class="file" id="file1" style="display: none">package authService
+
+import (
+    "context"
+    "errors"
+    "fmt"
+
+    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+)
+
+func (s *AuthService) Login(ctx context.Context, username, password string) (*models.User, error) <span class="cov8" title="1">{
+    if err := s.ValidateLogin(username, password); err != nil </span><span class="cov0" title="0">{
+        return nil, err
+    }</span>
+
+    <span class="cov8" title="1">user, err := s.authStorage.GetUserByUsername(ctx, username)
+    if err != nil </span><span class="cov8" title="1">{
+        return nil, fmt.Errorf("get user error: %w", err)
+    }</span>
+    <span class="cov8" title="1">if user == nil </span><span class="cov8" title="1">{
+        return nil, errors.New("user not found")
+    }</span>
+    
+    <span class="cov8" title="1">if !s.authStorage.CheckPasswordHash(password, user.PasswordHash) </span><span class="cov8" title="1">{
+        return nil, errors.New("invalid password")
+    }</span>
+    
+    <span class="cov8" title="1">return user, nil</span>
+}</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Code generated by mockery v2.53.5. DO NOT EDIT.
+
+package mocks
+
+import (
+        context "context"
+
+        models "github.com/nineteen-night/empty-room-game/internal/auth/models"
+        mock "github.com/stretchr/testify/mock"
+)
+
+// AuthStorage is an autogenerated mock type for the AuthStorage type
+type AuthStorage struct {
+        mock.Mock
+}
+
+type AuthStorage_Expecter struct {
+        mock *mock.Mock
+}
+
+func (_m *AuthStorage) EXPECT() *AuthStorage_Expecter <span class="cov0" title="0">{
+        return &amp;AuthStorage_Expecter{mock: &amp;_m.Mock}
+}</span>
+
+// CheckPasswordHash provides a mock function with given fields: password, hash
+func (_m *AuthStorage) CheckPasswordHash(password string, hash string) bool <span class="cov0" title="0">{
+        ret := _m.Called(password, hash)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for CheckPasswordHash")</span>
+        }
+
+        <span class="cov0" title="0">var r0 bool
+        if rf, ok := ret.Get(0).(func(string, string) bool); ok </span><span class="cov0" title="0">{
+                r0 = rf(password, hash)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(bool)
+        }</span>
+
+        <span class="cov0" title="0">return r0</span>
+}
+
+// AuthStorage_CheckPasswordHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CheckPasswordHash'
+type AuthStorage_CheckPasswordHash_Call struct {
+        *mock.Call
+}
+
+// CheckPasswordHash is a helper method to define mock.On call
+//   - password string
+//   - hash string
+func (_e *AuthStorage_Expecter) CheckPasswordHash(password interface{}, hash interface{}) *AuthStorage_CheckPasswordHash_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_CheckPasswordHash_Call{Call: _e.mock.On("CheckPasswordHash", password, hash)}
+}</span>
+
+func (_c *AuthStorage_CheckPasswordHash_Call) Run(run func(password string, hash string)) *AuthStorage_CheckPasswordHash_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(string), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_CheckPasswordHash_Call) Return(_a0 bool) *AuthStorage_CheckPasswordHash_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0)
+        return _c
+}</span>
+
+func (_c *AuthStorage_CheckPasswordHash_Call) RunAndReturn(run func(string, string) bool) *AuthStorage_CheckPasswordHash_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// CreatePartnership provides a mock function with given fields: ctx, user1ID, user2ID
+func (_m *AuthStorage) CreatePartnership(ctx context.Context, user1ID string, user2ID string) (string, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, user1ID, user2ID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for CreatePartnership")</span>
+        }
+
+        <span class="cov0" title="0">var r0 string
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string, string) (string, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, user1ID, user2ID)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string, string) string); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, user1ID, user2ID)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(string)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, user1ID, user2ID)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_CreatePartnership_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePartnership'
+type AuthStorage_CreatePartnership_Call struct {
+        *mock.Call
+}
+
+// CreatePartnership is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user1ID string
+//   - user2ID string
+func (_e *AuthStorage_Expecter) CreatePartnership(ctx interface{}, user1ID interface{}, user2ID interface{}) *AuthStorage_CreatePartnership_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_CreatePartnership_Call{Call: _e.mock.On("CreatePartnership", ctx, user1ID, user2ID)}
+}</span>
+
+func (_c *AuthStorage_CreatePartnership_Call) Run(run func(ctx context.Context, user1ID string, user2ID string)) *AuthStorage_CreatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string), args[2].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_CreatePartnership_Call) Return(_a0 string, _a1 error) *AuthStorage_CreatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_CreatePartnership_Call) RunAndReturn(run func(context.Context, string, string) (string, error)) *AuthStorage_CreatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// CreateUser provides a mock function with given fields: ctx, user
+func (_m *AuthStorage) CreateUser(ctx context.Context, user *models.User) (string, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, user)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for CreateUser")</span>
+        }
+
+        <span class="cov0" title="0">var r0 string
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, *models.User) (string, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, user)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, *models.User) string); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, user)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(string)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, *models.User) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, user)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_CreateUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateUser'
+type AuthStorage_CreateUser_Call struct {
+        *mock.Call
+}
+
+// CreateUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user *models.User
+func (_e *AuthStorage_Expecter) CreateUser(ctx interface{}, user interface{}) *AuthStorage_CreateUser_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_CreateUser_Call{Call: _e.mock.On("CreateUser", ctx, user)}
+}</span>
+
+func (_c *AuthStorage_CreateUser_Call) Run(run func(ctx context.Context, user *models.User)) *AuthStorage_CreateUser_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(*models.User))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_CreateUser_Call) Return(_a0 string, _a1 error) *AuthStorage_CreateUser_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_CreateUser_Call) RunAndReturn(run func(context.Context, *models.User) (string, error)) *AuthStorage_CreateUser_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// GetPartnershipBetweenUsers provides a mock function with given fields: ctx, user1ID, user2ID
+func (_m *AuthStorage) GetPartnershipBetweenUsers(ctx context.Context, user1ID string, user2ID string) (*models.Partnership, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, user1ID, user2ID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetPartnershipBetweenUsers")</span>
+        }
+
+        <span class="cov0" title="0">var r0 *models.Partnership
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string, string) (*models.Partnership, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, user1ID, user2ID)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string, string) *models.Partnership); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, user1ID, user2ID)
+        }</span> else<span class="cov0" title="0"> {
+                if ret.Get(0) != nil </span><span class="cov0" title="0">{
+                        r0 = ret.Get(0).(*models.Partnership)
+                }</span>
+        }
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, user1ID, user2ID)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_GetPartnershipBetweenUsers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPartnershipBetweenUsers'
+type AuthStorage_GetPartnershipBetweenUsers_Call struct {
+        *mock.Call
+}
+
+// GetPartnershipBetweenUsers is a helper method to define mock.On call
+//   - ctx context.Context
+//   - user1ID string
+//   - user2ID string
+func (_e *AuthStorage_Expecter) GetPartnershipBetweenUsers(ctx interface{}, user1ID interface{}, user2ID interface{}) *AuthStorage_GetPartnershipBetweenUsers_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_GetPartnershipBetweenUsers_Call{Call: _e.mock.On("GetPartnershipBetweenUsers", ctx, user1ID, user2ID)}
+}</span>
+
+func (_c *AuthStorage_GetPartnershipBetweenUsers_Call) Run(run func(ctx context.Context, user1ID string, user2ID string)) *AuthStorage_GetPartnershipBetweenUsers_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string), args[2].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_GetPartnershipBetweenUsers_Call) Return(_a0 *models.Partnership, _a1 error) *AuthStorage_GetPartnershipBetweenUsers_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_GetPartnershipBetweenUsers_Call) RunAndReturn(run func(context.Context, string, string) (*models.Partnership, error)) *AuthStorage_GetPartnershipBetweenUsers_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// GetPartnershipByID provides a mock function with given fields: ctx, partnershipID
+func (_m *AuthStorage) GetPartnershipByID(ctx context.Context, partnershipID string) (*models.Partnership, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, partnershipID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetPartnershipByID")</span>
+        }
+
+        <span class="cov0" title="0">var r0 *models.Partnership
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) (*models.Partnership, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, partnershipID)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string) *models.Partnership); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, partnershipID)
+        }</span> else<span class="cov0" title="0"> {
+                if ret.Get(0) != nil </span><span class="cov0" title="0">{
+                        r0 = ret.Get(0).(*models.Partnership)
+                }</span>
+        }
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, partnershipID)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_GetPartnershipByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPartnershipByID'
+type AuthStorage_GetPartnershipByID_Call struct {
+        *mock.Call
+}
+
+// GetPartnershipByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - partnershipID string
+func (_e *AuthStorage_Expecter) GetPartnershipByID(ctx interface{}, partnershipID interface{}) *AuthStorage_GetPartnershipByID_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_GetPartnershipByID_Call{Call: _e.mock.On("GetPartnershipByID", ctx, partnershipID)}
+}</span>
+
+func (_c *AuthStorage_GetPartnershipByID_Call) Run(run func(ctx context.Context, partnershipID string)) *AuthStorage_GetPartnershipByID_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_GetPartnershipByID_Call) Return(_a0 *models.Partnership, _a1 error) *AuthStorage_GetPartnershipByID_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_GetPartnershipByID_Call) RunAndReturn(run func(context.Context, string) (*models.Partnership, error)) *AuthStorage_GetPartnershipByID_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// GetUserByID provides a mock function with given fields: ctx, userID
+func (_m *AuthStorage) GetUserByID(ctx context.Context, userID string) (*models.User, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, userID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetUserByID")</span>
+        }
+
+        <span class="cov0" title="0">var r0 *models.User
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) (*models.User, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, userID)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string) *models.User); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, userID)
+        }</span> else<span class="cov0" title="0"> {
+                if ret.Get(0) != nil </span><span class="cov0" title="0">{
+                        r0 = ret.Get(0).(*models.User)
+                }</span>
+        }
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, userID)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_GetUserByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserByID'
+type AuthStorage_GetUserByID_Call struct {
+        *mock.Call
+}
+
+// GetUserByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+func (_e *AuthStorage_Expecter) GetUserByID(ctx interface{}, userID interface{}) *AuthStorage_GetUserByID_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_GetUserByID_Call{Call: _e.mock.On("GetUserByID", ctx, userID)}
+}</span>
+
+func (_c *AuthStorage_GetUserByID_Call) Run(run func(ctx context.Context, userID string)) *AuthStorage_GetUserByID_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_GetUserByID_Call) Return(_a0 *models.User, _a1 error) *AuthStorage_GetUserByID_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_GetUserByID_Call) RunAndReturn(run func(context.Context, string) (*models.User, error)) *AuthStorage_GetUserByID_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// GetUserByUsername provides a mock function with given fields: ctx, username
+func (_m *AuthStorage) GetUserByUsername(ctx context.Context, username string) (*models.User, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, username)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for GetUserByUsername")</span>
+        }
+
+        <span class="cov0" title="0">var r0 *models.User
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) (*models.User, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, username)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string) *models.User); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, username)
+        }</span> else<span class="cov0" title="0"> {
+                if ret.Get(0) != nil </span><span class="cov0" title="0">{
+                        r0 = ret.Get(0).(*models.User)
+                }</span>
+        }
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, username)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_GetUserByUsername_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetUserByUsername'
+type AuthStorage_GetUserByUsername_Call struct {
+        *mock.Call
+}
+
+// GetUserByUsername is a helper method to define mock.On call
+//   - ctx context.Context
+//   - username string
+func (_e *AuthStorage_Expecter) GetUserByUsername(ctx interface{}, username interface{}) *AuthStorage_GetUserByUsername_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_GetUserByUsername_Call{Call: _e.mock.On("GetUserByUsername", ctx, username)}
+}</span>
+
+func (_c *AuthStorage_GetUserByUsername_Call) Run(run func(ctx context.Context, username string)) *AuthStorage_GetUserByUsername_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_GetUserByUsername_Call) Return(_a0 *models.User, _a1 error) *AuthStorage_GetUserByUsername_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_GetUserByUsername_Call) RunAndReturn(run func(context.Context, string) (*models.User, error)) *AuthStorage_GetUserByUsername_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// HashPassword provides a mock function with given fields: password
+func (_m *AuthStorage) HashPassword(password string) (string, error) <span class="cov0" title="0">{
+        ret := _m.Called(password)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for HashPassword")</span>
+        }
+
+        <span class="cov0" title="0">var r0 string
+        var r1 error
+        if rf, ok := ret.Get(0).(func(string) (string, error)); ok </span><span class="cov0" title="0">{
+                return rf(password)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(string) string); ok </span><span class="cov0" title="0">{
+                r0 = rf(password)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(string)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(string) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(password)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_HashPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HashPassword'
+type AuthStorage_HashPassword_Call struct {
+        *mock.Call
+}
+
+// HashPassword is a helper method to define mock.On call
+//   - password string
+func (_e *AuthStorage_Expecter) HashPassword(password interface{}) *AuthStorage_HashPassword_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_HashPassword_Call{Call: _e.mock.On("HashPassword", password)}
+}</span>
+
+func (_c *AuthStorage_HashPassword_Call) Run(run func(password string)) *AuthStorage_HashPassword_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_HashPassword_Call) Return(_a0 string, _a1 error) *AuthStorage_HashPassword_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_HashPassword_Call) RunAndReturn(run func(string) (string, error)) *AuthStorage_HashPassword_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// TerminatePartnership provides a mock function with given fields: ctx, partnershipID
+func (_m *AuthStorage) TerminatePartnership(ctx context.Context, partnershipID string) error <span class="cov0" title="0">{
+        ret := _m.Called(ctx, partnershipID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for TerminatePartnership")</span>
+        }
+
+        <span class="cov0" title="0">var r0 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, partnershipID)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Error(0)
+        }</span>
+
+        <span class="cov0" title="0">return r0</span>
+}
+
+// AuthStorage_TerminatePartnership_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TerminatePartnership'
+type AuthStorage_TerminatePartnership_Call struct {
+        *mock.Call
+}
+
+// TerminatePartnership is a helper method to define mock.On call
+//   - ctx context.Context
+//   - partnershipID string
+func (_e *AuthStorage_Expecter) TerminatePartnership(ctx interface{}, partnershipID interface{}) *AuthStorage_TerminatePartnership_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_TerminatePartnership_Call{Call: _e.mock.On("TerminatePartnership", ctx, partnershipID)}
+}</span>
+
+func (_c *AuthStorage_TerminatePartnership_Call) Run(run func(ctx context.Context, partnershipID string)) *AuthStorage_TerminatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_TerminatePartnership_Call) Return(_a0 error) *AuthStorage_TerminatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0)
+        return _c
+}</span>
+
+func (_c *AuthStorage_TerminatePartnership_Call) RunAndReturn(run func(context.Context, string) error) *AuthStorage_TerminatePartnership_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// UpdateUserMaxRoom provides a mock function with given fields: ctx, userID, roomNumber
+func (_m *AuthStorage) UpdateUserMaxRoom(ctx context.Context, userID string, roomNumber int32) (bool, error) <span class="cov0" title="0">{
+        ret := _m.Called(ctx, userID, roomNumber)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for UpdateUserMaxRoom")</span>
+        }
+
+        <span class="cov0" title="0">var r0 bool
+        var r1 error
+        if rf, ok := ret.Get(0).(func(context.Context, string, int32) (bool, error)); ok </span><span class="cov0" title="0">{
+                return rf(ctx, userID, roomNumber)
+        }</span>
+        <span class="cov0" title="0">if rf, ok := ret.Get(0).(func(context.Context, string, int32) bool); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, userID, roomNumber)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Get(0).(bool)
+        }</span>
+
+        <span class="cov0" title="0">if rf, ok := ret.Get(1).(func(context.Context, string, int32) error); ok </span><span class="cov0" title="0">{
+                r1 = rf(ctx, userID, roomNumber)
+        }</span> else<span class="cov0" title="0"> {
+                r1 = ret.Error(1)
+        }</span>
+
+        <span class="cov0" title="0">return r0, r1</span>
+}
+
+// AuthStorage_UpdateUserMaxRoom_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateUserMaxRoom'
+type AuthStorage_UpdateUserMaxRoom_Call struct {
+        *mock.Call
+}
+
+// UpdateUserMaxRoom is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID string
+//   - roomNumber int32
+func (_e *AuthStorage_Expecter) UpdateUserMaxRoom(ctx interface{}, userID interface{}, roomNumber interface{}) *AuthStorage_UpdateUserMaxRoom_Call <span class="cov0" title="0">{
+        return &amp;AuthStorage_UpdateUserMaxRoom_Call{Call: _e.mock.On("UpdateUserMaxRoom", ctx, userID, roomNumber)}
+}</span>
+
+func (_c *AuthStorage_UpdateUserMaxRoom_Call) Run(run func(ctx context.Context, userID string, roomNumber int32)) *AuthStorage_UpdateUserMaxRoom_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string), args[2].(int32))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *AuthStorage_UpdateUserMaxRoom_Call) Return(_a0 bool, _a1 error) *AuthStorage_UpdateUserMaxRoom_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0, _a1)
+        return _c
+}</span>
+
+func (_c *AuthStorage_UpdateUserMaxRoom_Call) RunAndReturn(run func(context.Context, string, int32) (bool, error)) *AuthStorage_UpdateUserMaxRoom_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// NewAuthStorage creates a new instance of AuthStorage. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+// The first argument is typically a *testing.T value.
+func NewAuthStorage(t interface {
+        mock.TestingT
+        Cleanup(func())
+}) *AuthStorage <span class="cov0" title="0">{
+        mock := &amp;AuthStorage{}
+        mock.Mock.Test(t)
+
+        t.Cleanup(func() </span><span class="cov0" title="0">{ mock.AssertExpectations(t) }</span>)
+
+        <span class="cov0" title="0">return mock</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">// Code generated by mockery v2.53.5. DO NOT EDIT.
+
+package mocks
+
+import (
+        context "context"
+
+        mock "github.com/stretchr/testify/mock"
+)
+
+// EventSender is an autogenerated mock type for the EventSender type
+type EventSender struct {
+        mock.Mock
+}
+
+type EventSender_Expecter struct {
+        mock *mock.Mock
+}
+
+func (_m *EventSender) EXPECT() *EventSender_Expecter <span class="cov0" title="0">{
+        return &amp;EventSender_Expecter{mock: &amp;_m.Mock}
+}</span>
+
+// SendPartnershipCreated provides a mock function with given fields: ctx, partnershipID, user1ID, user2ID
+func (_m *EventSender) SendPartnershipCreated(ctx context.Context, partnershipID string, user1ID string, user2ID string) error <span class="cov0" title="0">{
+        ret := _m.Called(ctx, partnershipID, user1ID, user2ID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for SendPartnershipCreated")</span>
+        }
+
+        <span class="cov0" title="0">var r0 error
+        if rf, ok := ret.Get(0).(func(context.Context, string, string, string) error); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, partnershipID, user1ID, user2ID)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Error(0)
+        }</span>
+
+        <span class="cov0" title="0">return r0</span>
+}
+
+// EventSender_SendPartnershipCreated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SendPartnershipCreated'
+type EventSender_SendPartnershipCreated_Call struct {
+        *mock.Call
+}
+
+// SendPartnershipCreated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - partnershipID string
+//   - user1ID string
+//   - user2ID string
+func (_e *EventSender_Expecter) SendPartnershipCreated(ctx interface{}, partnershipID interface{}, user1ID interface{}, user2ID interface{}) *EventSender_SendPartnershipCreated_Call <span class="cov0" title="0">{
+        return &amp;EventSender_SendPartnershipCreated_Call{Call: _e.mock.On("SendPartnershipCreated", ctx, partnershipID, user1ID, user2ID)}
+}</span>
+
+func (_c *EventSender_SendPartnershipCreated_Call) Run(run func(ctx context.Context, partnershipID string, user1ID string, user2ID string)) *EventSender_SendPartnershipCreated_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *EventSender_SendPartnershipCreated_Call) Return(_a0 error) *EventSender_SendPartnershipCreated_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0)
+        return _c
+}</span>
+
+func (_c *EventSender_SendPartnershipCreated_Call) RunAndReturn(run func(context.Context, string, string, string) error) *EventSender_SendPartnershipCreated_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// SendPartnershipTerminated provides a mock function with given fields: ctx, partnershipID
+func (_m *EventSender) SendPartnershipTerminated(ctx context.Context, partnershipID string) error <span class="cov0" title="0">{
+        ret := _m.Called(ctx, partnershipID)
+
+        if len(ret) == 0 </span><span class="cov0" title="0">{
+                panic("no return value specified for SendPartnershipTerminated")</span>
+        }
+
+        <span class="cov0" title="0">var r0 error
+        if rf, ok := ret.Get(0).(func(context.Context, string) error); ok </span><span class="cov0" title="0">{
+                r0 = rf(ctx, partnershipID)
+        }</span> else<span class="cov0" title="0"> {
+                r0 = ret.Error(0)
+        }</span>
+
+        <span class="cov0" title="0">return r0</span>
+}
+
+// EventSender_SendPartnershipTerminated_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SendPartnershipTerminated'
+type EventSender_SendPartnershipTerminated_Call struct {
+        *mock.Call
+}
+
+// SendPartnershipTerminated is a helper method to define mock.On call
+//   - ctx context.Context
+//   - partnershipID string
+func (_e *EventSender_Expecter) SendPartnershipTerminated(ctx interface{}, partnershipID interface{}) *EventSender_SendPartnershipTerminated_Call <span class="cov0" title="0">{
+        return &amp;EventSender_SendPartnershipTerminated_Call{Call: _e.mock.On("SendPartnershipTerminated", ctx, partnershipID)}
+}</span>
+
+func (_c *EventSender_SendPartnershipTerminated_Call) Run(run func(ctx context.Context, partnershipID string)) *EventSender_SendPartnershipTerminated_Call <span class="cov0" title="0">{
+        _c.Call.Run(func(args mock.Arguments) </span><span class="cov0" title="0">{
+                run(args[0].(context.Context), args[1].(string))
+        }</span>)
+        <span class="cov0" title="0">return _c</span>
+}
+
+func (_c *EventSender_SendPartnershipTerminated_Call) Return(_a0 error) *EventSender_SendPartnershipTerminated_Call <span class="cov0" title="0">{
+        _c.Call.Return(_a0)
+        return _c
+}</span>
+
+func (_c *EventSender_SendPartnershipTerminated_Call) RunAndReturn(run func(context.Context, string) error) *EventSender_SendPartnershipTerminated_Call <span class="cov0" title="0">{
+        _c.Call.Return(run)
+        return _c
+}</span>
+
+// NewEventSender creates a new instance of EventSender. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+// The first argument is typically a *testing.T value.
+func NewEventSender(t interface {
+        mock.TestingT
+        Cleanup(func())
+}) *EventSender <span class="cov0" title="0">{
+        mock := &amp;EventSender{}
+        mock.Mock.Test(t)
+
+        t.Cleanup(func() </span><span class="cov0" title="0">{ mock.AssertExpectations(t) }</span>)
+
+        <span class="cov0" title="0">return mock</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package authService
+
+import (
+    "context"
+    "errors"
+    "fmt"
+
+    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+)
+
+func (s *AuthService) CreatePartnership(ctx context.Context, currentUserID, partnerUsername string) (*models.Partnership, error) <span class="cov8" title="1">{
+    if len(partnerUsername) &lt; s.minNameLen || len(partnerUsername) &gt; s.maxNameLen </span><span class="cov8" title="1">{
+        return nil, fmt.Errorf("имя партнёра должно быть от %d до %d символов",
+            s.minNameLen, s.maxNameLen)
+    }</span>
+
+    <span class="cov8" title="1">partner, err := s.authStorage.GetUserByUsername(ctx, partnerUsername)
+    if err != nil </span><span class="cov0" title="0">{
+        return nil, fmt.Errorf("ошибка получения партнёра: %w", err)
+    }</span>
+    <span class="cov8" title="1">if partner == nil </span><span class="cov8" title="1">{
+        return nil, errors.New("партнёр не найден")
+    }</span>
+
+    <span class="cov8" title="1">if err := s.ValidatePartnershipCreation(currentUserID, partner.ID); err != nil </span><span class="cov8" title="1">{
+        return nil, err
+    }</span>
+
+    <span class="cov8" title="1">existingPartnership, err := s.authStorage.GetPartnershipBetweenUsers(ctx, currentUserID, partner.ID)
+    if err != nil </span><span class="cov0" title="0">{
+        return nil, fmt.Errorf("ошибка проверки существующего партнёрства: %w", err)
+    }</span>
+    
+    <span class="cov8" title="1">if existingPartnership != nil </span><span class="cov8" title="1">{
+        return nil, errors.New("партнёрство уже существует")
+    }</span>
+
+    <span class="cov8" title="1">partnershipID, err := s.authStorage.CreatePartnership(ctx, currentUserID, partner.ID)
+    if err != nil </span><span class="cov0" title="0">{
+        return nil, fmt.Errorf("ошибка создания партнёрства: %w", err)
+    }</span>
+
+    <span class="cov8" title="1">if s.eventSender != nil </span><span class="cov8" title="1">{
+        if err := s.eventSender.SendPartnershipCreated(ctx, partnershipID, currentUserID, partner.ID); err != nil </span><span class="cov8" title="1">{
+            fmt.Printf("не удалось отправить событие: %v\n", err)
+        }</span>
+    }
+    
+    <span class="cov8" title="1">return &amp;models.Partnership{
+        ID:       partnershipID,
+        User1ID:  currentUserID,
+        User2ID:  partner.ID,
+    }, nil</span>
+}
+
+func (s *AuthService) TerminatePartnership(ctx context.Context, partnershipID string) error <span class="cov8" title="1">{
+    if err := s.ValidatePartnershipTermination(partnershipID); err != nil </span><span class="cov8" title="1">{
+        return err
+    }</span>
+
+    <span class="cov8" title="1">if err := s.authStorage.TerminatePartnership(ctx, partnershipID); err != nil </span><span class="cov8" title="1">{
+        return fmt.Errorf("ошибка расторжения партнёрства: %w", err)
+    }</span>
+
+    <span class="cov8" title="1">if s.eventSender != nil </span><span class="cov8" title="1">{
+        if err := s.eventSender.SendPartnershipTerminated(ctx, partnershipID); err != nil </span><span class="cov8" title="1">{
+            fmt.Printf("Предупреждение: не удалось отправить событие: %v\n", err)
+        }</span>
+    }
+    
+    <span class="cov8" title="1">return nil</span>
+}</pre>
+		
+		<pre class="file" id="file5" style="display: none">package authService
+
+import (
+    "context"
+    "errors"
+    "fmt"
+
+    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+)
+
+func (s *AuthService) Register(ctx context.Context, username, email, password string) (*models.User, error) <span class="cov8" title="1">{
+    if err := s.ValidateRegistration(username, email, password); err != nil </span><span class="cov8" title="1">{
+        return nil, err
+    }</span>
+
+    <span class="cov8" title="1">existing, err := s.authStorage.GetUserByUsername(ctx, username)
+    if err != nil </span><span class="cov0" title="0">{
+        return nil, fmt.Errorf("ошибка проверки пользователя: %w", err)
+    }</span>
+    <span class="cov8" title="1">if existing != nil </span><span class="cov8" title="1">{
+        return nil, errors.New("пользователь с таким именем уже существует")
+    }</span>
+
+    <span class="cov8" title="1">hash, err := s.authStorage.HashPassword(password)
+    if err != nil </span><span class="cov8" title="1">{
+        return nil, fmt.Errorf("ошибка хэширования пароля: %w", err)
+    }</span>
+
+    <span class="cov8" title="1">user := &amp;models.User{
+        Username:       username,
+        Email:          email,
+        PasswordHash:   hash,
+        MaxRoomReached: 0,
+    }
+    
+    userID, err := s.authStorage.CreateUser(ctx, user)
+    if err != nil </span><span class="cov8" title="1">{
+        return nil, fmt.Errorf("ошибка создания пользователя: %w", err)
+    }</span>
+    
+    <span class="cov8" title="1">user.ID = userID
+    return user, nil</span>
+}</pre>
+		
+		<pre class="file" id="file6" style="display: none">package authService
+
+import (
+    "context"
+    "errors"
+    "fmt"
+
+    "github.com/nineteen-night/empty-room-game/internal/auth/models"
+)
+
+func (s *AuthService) GetUser(ctx context.Context, userID string) (*models.User, error) <span class="cov8" title="1">{
+    user, err := s.authStorage.GetUserByID(ctx, userID)
+    if err != nil </span><span class="cov8" title="1">{
+        return nil, fmt.Errorf("get user error: %w", err)
+    }</span>
+    <span class="cov8" title="1">if user == nil </span><span class="cov8" title="1">{
+        return nil, errors.New("пользователь не найден")
+    }</span>
+    <span class="cov8" title="1">return user, nil</span>
+}
+
+func (s *AuthService) HandleRoomCompleted(ctx context.Context, userID string, roomNumber int32) error <span class="cov8" title="1">{
+    if err := s.ValidateRoomCompletion(userID, roomNumber); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+
+    <span class="cov8" title="1">updated, err := s.authStorage.UpdateUserMaxRoom(ctx, userID, roomNumber)
+    if err != nil </span><span class="cov8" title="1">{
+        return fmt.Errorf("update max room error: %w", err)
+    }</span>
+    
+    <span class="cov8" title="1">if updated </span><span class="cov8" title="1">{
+        fmt.Printf("User %s max room updated to %d\n", userID, roomNumber)
+    }</span>
+    
+    <span class="cov8" title="1">return nil</span>
+}</pre>
+		
+		<pre class="file" id="file7" style="display: none">package authService
+
+import (
+    "errors"
+    "fmt"
+    "net/mail"
+    "strings"
+
+)
+
+// Валидация регистрации
+func (s *AuthService) ValidateRegistration(username, email, password string) error <span class="cov8" title="1">{
+    if len(username) &lt; s.minNameLen || len(username) &gt; s.maxNameLen </span><span class="cov8" title="1">{
+        return fmt.Errorf("имя пользователя должно быть от %d до %d символов", 
+            s.minNameLen, s.maxNameLen)
+    }</span>
+
+    <span class="cov8" title="1">if len(password) &lt; 6 </span><span class="cov8" title="1">{
+        return errors.New("пароль должен быть не менее 6 символов")
+    }</span>
+
+    <span class="cov8" title="1">if !s.IsValidEmail(email) </span><span class="cov8" title="1">{
+        return fmt.Errorf("некорректный email: %s", email)
+    }</span>
+
+    <span class="cov8" title="1">return nil</span>
+}
+
+// Валидация входа
+func (s *AuthService) ValidateLogin(username, password string) error <span class="cov8" title="1">{
+    if len(username) &lt; s.minNameLen || len(username) &gt; s.maxNameLen </span><span class="cov8" title="1">{
+        return fmt.Errorf("имя пользователя должно быть от %d до %d символов",
+            s.minNameLen, s.maxNameLen)
+    }</span>
+
+    <span class="cov8" title="1">if len(password) &lt; 1 </span><span class="cov8" title="1">{
+        return errors.New("пароль не может быть пустым")
+    }</span>
+
+    <span class="cov8" title="1">return nil</span>
+}
+
+// Валидация создания партнёрства
+func (s *AuthService) ValidatePartnershipCreation(user1ID, user2ID string) error <span class="cov8" title="1">{
+    if user1ID == "" || user2ID == "" </span><span class="cov8" title="1">{
+        return errors.New("ID пользователей не могут быть пустыми")
+    }</span>
+
+    <span class="cov8" title="1">if user1ID == user2ID </span><span class="cov8" title="1">{
+        return errors.New("нельзя создать партнёрство с самим собой")
+    }</span>
+
+    <span class="cov8" title="1">return nil</span>
+}
+
+// Валидация расторжения партнёрства
+func (s *AuthService) ValidatePartnershipTermination(partnershipID string) error <span class="cov8" title="1">{
+    if partnershipID == "" </span><span class="cov8" title="1">{
+        return errors.New("ID партнёрства не может быть пустым")
+    }</span>
+    <span class="cov8" title="1">return nil</span>
+}
+
+// Проверка email
+func (s *AuthService) IsValidEmail(email string) bool <span class="cov8" title="1">{
+        if len(email) &lt; 3 || len(email) &gt; 254 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">_, err := mail.ParseAddress(email)
+        if err != nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">parts := strings.Split(email, "@")
+        if len(parts) != 2 </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">if len(parts[0]) == 0 || len(parts[0]) &gt; 64 </span><span class="cov8" title="1">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">if len(parts[1]) == 0 || len(parts[1]) &gt; 253 </span><span class="cov0" title="0">{
+                return false
+        }</span>
+
+        <span class="cov8" title="1">return true</span>
+}
+
+// ValidateRoomCompletion - валидация завершения комнаты
+func (s *AuthService) ValidateRoomCompletion(userID string, roomNumber int32) error <span class="cov8" title="1">{
+    if userID == "" </span><span class="cov8" title="1">{
+        return errors.New("ID пользователя не может быть пустым")
+    }</span>
+
+    <span class="cov8" title="1">if roomNumber &lt; 1 </span><span class="cov8" title="1">{
+        return errors.New("номер комнаты должен быть положительным")
+    }</span>
+
+    <span class="cov8" title="1">return nil</span>
+}</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

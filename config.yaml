@@ -7,13 +7,15 @@ database:
     name: "auth_db"
     ssl_mode: "disable"
   
-  game_db:
+  game_db: 
     host: "localhost"
     port: 5433
     username: "game_user"
     password: "game_password"
     name: "game_db"
     ssl_mode: "disable"
+    shard_count: 2  
+
 
 kafka:
   host: "localhost"
@@ -32,18 +34,3 @@ GameServiceSettings:
   grpc_port: 50052
   min_name_len: 1
   max_name_len: 100
-
-game_shards:
-  - host: "localhost"
-    port: 5433
-    username: "game_user"
-    password: "game_password"
-    name: "game_db_shard_0"
-    ssl_mode: "disable"
-  
-  - host: "localhost"
-    port: 5434
-    username: "game_user"
-    password: "game_password"
-    name: "game_db_shard_1"
-    ssl_mode: "disable"

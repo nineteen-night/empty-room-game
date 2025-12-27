@@ -7,12 +7,14 @@ import "models/game_model.proto";
 import "google/api/annotations.proto";
 
 service GameService {
+    // Получение состояния игры
     rpc GetGameState (GetGameStateRequest) returns (GetGameStateResponse) {
         option (google.api.http) = {
             get: "/game/{partnership_id}/state"
         };
     }
 
+    // Переход в следующую комнату
     rpc MoveToNextRoom (MoveToNextRoomRequest) returns (MoveToNextRoomResponse) {
         option (google.api.http) = {
             post: "/game/{partnership_id}/move"
@@ -21,6 +23,7 @@ service GameService {
     }
 }
 
+// Запросы
 message GetGameStateRequest {
     string partnership_id = 1;
 }

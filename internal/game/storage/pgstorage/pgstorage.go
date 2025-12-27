@@ -5,129 +5,123 @@ import (
     "fmt"
     "hash/fnv"
     "sync"
-    "log/slog"
 
     "github.com/jackc/pgx/v5/pgxpool"
     "github.com/pkg/errors"
 )
 
 type PGStorage struct {
-    shards []*pgxpool.Pool
-    mu     sync.RWMutex
+    db        *pgxpool.Pool 
+    shardCount int        
+    mu        sync.RWMutex
 }
 
-func NewPGStorage(shardConfigs []struct {
-    Host, Username, Password, DBName, SSLMode string
-    Port int
-}) (*PGStorage, error) {
-    storage := &PGStorage{
-        shards: make([]*pgxpool.Pool, len(shardConfigs)),
+
+func NewPGStorage(connString string, shardCount int) (*PGStorage, error) {
+    config, err := pgxpool.ParseConfig(connString)
+    if err != nil {
+        return nil, errors.Wrap(err, "ошибка парсинга конфига")
     }
 
-    for i, cfg := range shardConfigs {
-        connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
-            cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
-        
-        config, err := pgxpool.ParseConfig(connStr)
-        if err != nil {
-            return nil, errors.Wrap(err, "ошибка парсинга конфига")
-        }
+    db, err := pgxpool.NewWithConfig(context.Background(), config)
+    if err != nil {
+        return nil, errors.Wrap(err, "ошибка подключения")
+    }
+    
+    storage := &PGStorage{
+        db:        db,
+        shardCount: shardCount,
+    }
 
-        db, err := pgxpool.NewWithConfig(context.Background(), config)
-        if err != nil {
-            return nil, errors.Wrap(err, "ошибка подключения к шарду")
-        }
-        
-        storage.shards[i] = db
-        
-        if err := storage.initShardTables(i); err != nil {
-            return nil, fmt.Errorf("ошибка инициализации шарда %d: %w", i, err)
-        }
-        
-        slog.Info("Шард инициализирован", "шард", i, "база", cfg.DBName)
+    if err := storage.initSchemas(); err != nil {
+        db.Close()
+        return nil, fmt.Errorf("ошибка инициализации схем: %w", err)
     }
 
     return storage, nil
 }
 
-func (s *PGStorage) getShard(partnershipID string) *pgxpool.Pool {
-    if partnershipID == "" {
-        s.mu.RLock()
-        defer s.mu.RUnlock()
-        return s.shards[0]
+func (s *PGStorage) getSchema(partnershipID string) string {
+    if partnershipID == "" || s.shardCount == 0 {
+        return "shard_0"
     }
     
     h := fnv.New32a()
     h.Write([]byte(partnershipID))
-    idx := int(h.Sum32() % uint32(len(s.shards)))
-    
-    s.mu.RLock()
-    defer s.mu.RUnlock()
-    
-    if idx < len(s.shards) {
-        return s.shards[idx]
-    }
-    return s.shards[0]
+    hash := h.Sum32()
+
+    shardNum := int(hash % uint32(s.shardCount))
+    return fmt.Sprintf("shard_%d", shardNum)
 }
 
-func (s *PGStorage) initShardTables(shardIndex int) error {
-    s.mu.RLock()
-    db := s.shards[shardIndex]
-    s.mu.RUnlock()
-    
-    if db == nil {
-        return fmt.Errorf("нет соединения с шардом %d", shardIndex)
-    }
+func (s *PGStorage) initSchemas() error {
+    for i := 0; i < s.shardCount; i++ {
+        schemaName := fmt.Sprintf("shard_%d", i)
 
-    _, err := db.Exec(context.Background(), `
-        CREATE TABLE IF NOT EXISTS rooms (
+        _, err := s.db.Exec(context.Background(), 
+            fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s", schemaName))
+        if err != nil {
+            return errors.Wrapf(err, "ошибка создания схемы %s", schemaName)
+        }
+        
+        createTableSQL := fmt.Sprintf(`
+            CREATE TABLE IF NOT EXISTS %s.game_sessions (
+                partnership_id UUID PRIMARY KEY,
+                user1_id UUID NOT NULL,
+                user2_id UUID NOT NULL,
+                current_room INTEGER DEFAULT 1 NOT NULL
+            )`, schemaName)
+        
+        _, err = s.db.Exec(context.Background(), createTableSQL)
+        if err != nil {
+            return errors.Wrapf(err, "ошибка создания таблицы в схеме %s", schemaName)
+        }
+        
+
+        indexSQL := fmt.Sprintf(`
+            CREATE INDEX IF NOT EXISTS idx_%s_game_sessions_user1 
+            ON %s.game_sessions(user1_id);
+            CREATE INDEX IF NOT EXISTS idx_%s_game_sessions_user2 
+            ON %s.game_sessions(user2_id);
+        `, schemaName, schemaName, schemaName, schemaName)
+        
+        _, err = s.db.Exec(context.Background(), indexSQL)
+        if err != nil {
+            return errors.Wrapf(err, "ошибка создания индексов в схеме %s", schemaName)
+        }
+    }
+    
+
+    roomsSQL := `
+        CREATE TABLE IF NOT EXISTS public.rooms (
             room_number INTEGER PRIMARY KEY,
             name VARCHAR(50) NOT NULL,
             description TEXT NOT NULL
-        )
-    `)
+        )`
+    
+    _, err := s.db.Exec(context.Background(), roomsSQL)
     if err != nil {
-        return errors.Wrap(err, "создание таблицы rooms")
+        return errors.Wrap(err, "ошибка создания таблицы rooms")
     }
 
-    _, err = db.Exec(context.Background(), `
-        CREATE TABLE IF NOT EXISTS game_sessions (
-            partnership_id UUID PRIMARY KEY,
-            user1_id UUID NOT NULL,
-            user2_id UUID NOT NULL,
-            current_room INTEGER DEFAULT 1 NOT NULL
-        )
-    `)
-    if err != nil {
-        return errors.Wrap(err, "создание таблицы game_sessions")
-    }
-
-    _, err = db.Exec(context.Background(), `
-        CREATE INDEX IF NOT EXISTS idx_game_sessions_user1 ON game_sessions(user1_id);
-        CREATE INDEX IF NOT EXISTS idx_game_sessions_user2 ON game_sessions(user2_id);
-    `)
-    if err != nil {
-        return errors.Wrap(err, "создание индексов")
-    }
-
-    return s.initRoomsForShard(shardIndex)
+    return s.initRooms()
 }
 
-func (s *PGStorage) initRoomsForShard(shardIndex int) error {
-    s.mu.RLock()
-    db := s.shards[shardIndex]
-    s.mu.RUnlock()
+func (s *PGStorage) initRooms() error {
 
     var count int
-    err := db.QueryRow(context.Background(), 
-        "SELECT COUNT(*) FROM rooms").Scan(&count)
+    err := s.db.QueryRow(context.Background(), 
+        "SELECT COUNT(*) FROM public.rooms").Scan(&count)
     if err != nil {
+
         count = 0
     }
+
 
     if count > 0 {
         return nil
     }
+
 
     rooms := []struct {
         number      int32
@@ -142,8 +136,10 @@ func (s *PGStorage) initRoomsForShard(shardIndex int) error {
     }
 
     for _, room := range rooms {
-        _, err := db.Exec(context.Background(), 
-            "INSERT INTO rooms (room_number, name, description) VALUES ($1, $2, $3) ON CONFLICT (room_number) DO NOTHING",
+        _, err := s.db.Exec(context.Background(), 
+            `INSERT INTO public.rooms (room_number, name, description) 
+             VALUES ($1, $2, $3) 
+             ON CONFLICT (room_number) DO NOTHING`,
             room.number, room.name, room.description)
         if err != nil {
             return errors.Wrapf(err, "ошибка добавления комнаты %d", room.number)
@@ -153,24 +149,27 @@ func (s *PGStorage) initRoomsForShard(shardIndex int) error {
     return nil
 }
 
-func (s *PGStorage) getFirstShard() *pgxpool.Pool {
-    s.mu.RLock()
-    defer s.mu.RUnlock()
-    
-    if len(s.shards) > 0 {
-        return s.shards[0]
-    }
-    return nil
+
+func (s *PGStorage) getShardForPartnership(partnershipID string) string {
+    return s.getSchema(partnershipID)
 }
 
 func (s *PGStorage) Close() {
     s.mu.Lock()
     defer s.mu.Unlock()
     
-    for i, db := range s.shards {
-        if db != nil {
-            db.Close()
-            s.shards[i] = nil
-        }
+    if s.db != nil {
+        s.db.Close()
+        s.db = nil
     }
+}
+
+func (s *PGStorage) DebugSharding(partnershipID string) string {
+    schema := s.getSchema(partnershipID)
+    h := fnv.New32a()
+    h.Write([]byte(partnershipID))
+    hash := h.Sum32()
+    
+    return fmt.Sprintf("partnership_id: %s → hash: %d → schema: %s", 
+        partnershipID, hash, schema)
 }

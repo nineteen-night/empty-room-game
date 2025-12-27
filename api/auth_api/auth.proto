@@ -7,6 +7,7 @@ import "models/auth_model.proto";
 import "google/api/annotations.proto";
 
 service AuthService {
+    // Регистрация и вход
     rpc Register (RegisterRequest) returns (RegisterResponse) {
         option (google.api.http) = {
             post: "/auth/register"
@@ -21,6 +22,7 @@ service AuthService {
         };
     }
 
+    // Управление партнёрствами
     rpc CreatePartnership (CreatePartnershipRequest) returns (CreatePartnershipResponse) {
         option (google.api.http) = {
             post: "/partnership"
@@ -34,6 +36,7 @@ service AuthService {
         };
     }
 
+    // Получение информации о пользователе
     rpc GetUser (GetUserRequest) returns (GetUserResponse) {
         option (google.api.http) = {
             get: "/user/{user_id}"
@@ -41,6 +44,7 @@ service AuthService {
     }
 }
 
+// Регистрация
 message RegisterRequest {
     string username = 1;
     string email = 2;
@@ -51,6 +55,7 @@ message RegisterResponse {
     auth.models.v1.User user = 1;
 }
 
+// Вход
 message LoginRequest {
     string username = 1;
     string password = 2;
@@ -60,6 +65,7 @@ message LoginResponse {
     auth.models.v1.User user = 1;
 }
 
+// Партнёрства
 message CreatePartnershipRequest {
     string user_id = 1;
     string partner_username = 2;
@@ -77,6 +83,7 @@ message TerminatePartnershipResponse {
     bool success = 1;
 }
 
+// Пользователь
 message GetUserRequest {
     string user_id = 1;
 }

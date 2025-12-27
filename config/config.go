@@ -12,17 +12,8 @@ type Config struct {
     Kafka                KafkaConfig        `yaml:"kafka"`
     AuthServiceSettings  ServiceSettings    `yaml:"AuthServiceSettings"`
     GameServiceSettings  ServiceSettings    `yaml:"GameServiceSettings"`
-    GameShards []ShardConfig `yaml:"game_shards"`
 }
 
-type ShardConfig struct {
-    Host     string `yaml:"host"`
-    Port     int    `yaml:"port"`
-    Username string `yaml:"username"`
-    Password string `yaml:"password"`
-    DBName   string `yaml:"name"`
-    SSLMode  string `yaml:"ssl_mode"`
-}
 
 type DatabaseConfig struct {
     AuthDB DatabaseInstance `yaml:"auth_db"`
