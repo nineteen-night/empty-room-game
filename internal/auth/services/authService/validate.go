@@ -77,12 +77,10 @@ func (s *AuthService) IsValidEmail(email string) bool {
 		return false
 	}
 
-	// Проверяем длину local part (до @)
 	if len(parts[0]) == 0 || len(parts[0]) > 64 {
 		return false
 	}
 
-	// Проверяем длину domain part (после @)
 	if len(parts[1]) == 0 || len(parts[1]) > 253 {
 		return false
 	}

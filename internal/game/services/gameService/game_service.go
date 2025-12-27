@@ -14,7 +14,6 @@ type GameStorage interface {
 	UpdateCurrentRoom(ctx context.Context, partnershipID string, newRoom int32) error
 	GetRoomByNumber(ctx context.Context, roomNumber int32) (*models.Room, error)
 	GetMaxRoomNumber(ctx context.Context) (int32, error)
-	InitializeRooms(ctx context.Context) error
 	GetGameSessionsByUserID(ctx context.Context, userID string) ([]*models.GameSession, error)
 }
 
@@ -28,10 +27,6 @@ type GameService struct {
 }
 
 func NewGameService(ctx context.Context, gameStorage GameStorage) *GameService {
-	err := gameStorage.InitializeRooms(ctx)
-	if err != nil {
-		fmt.Printf("Предупреждение: не удалось инициализировать комнаты: %v\n", err)
-	}
 
 	return &GameService{
 		gameStorage: gameStorage,

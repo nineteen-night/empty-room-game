@@ -19,7 +19,8 @@ func (s *PGStorage) CreateGameSession(ctx context.Context, partnershipID, user1I
 		return errors.Wrap(err, "generate query error")
 	}
 
-	_, err = s.db.Exec(ctx, queryText, args...)
+	db := s.getShard(partnershipID)
+	_, err = db.Exec(ctx, queryText, args...)
 	if err != nil {
 		return errors.Wrap(err, "execute query error")
 	}
@@ -37,7 +38,8 @@ func (s *PGStorage) DeleteGameSession(ctx context.Context, partnershipID string)
 		return errors.Wrap(err, "generate query error")
 	}
 
-	result, err := s.db.Exec(ctx, queryText, args...)
+	db := s.getShard(partnershipID)
+	result, err := db.Exec(ctx, queryText, args...)
 	if err != nil {
 		return errors.Wrap(err, "execute query error")
 	}
@@ -60,7 +62,8 @@ func (s *PGStorage) UpdateCurrentRoom(ctx context.Context, partnershipID string,
 		return errors.Wrap(err, "generate query error")
 	}
 
-	result, err := s.db.Exec(ctx, queryText, args...)
+	db := s.getShard(partnershipID)
+	result, err := db.Exec(ctx, queryText, args...)
 	if err != nil {
 		return errors.Wrap(err, "execute query error")
 	}
@@ -73,13 +76,18 @@ func (s *PGStorage) UpdateCurrentRoom(ctx context.Context, partnershipID string,
 }
 
 func (s *PGStorage) GetMaxRoomNumber(ctx context.Context) (int32, error) {
-	query := fmt.Sprintf("SELECT MAX(%s) FROM %s", roomNumberColumn, roomsTable)
-	
-	var maxRoom int32
-	err := s.db.QueryRow(ctx, query).Scan(&maxRoom)
-	if err != nil {
-		return 0, errors.Wrap(err, "query error")
-	}
+    db := s.getFirstShard()
+    if db == nil {
+        return 0, fmt.Errorf("no database connection")
+    }
+    
+    query := fmt.Sprintf("SELECT MAX(%s) FROM %s", roomNumberColumn, roomsTable)
+    
+    var maxRoom int32
+    err := db.QueryRow(ctx, query).Scan(&maxRoom)
+    if err != nil {
+        return 0, errors.Wrap(err, "query error")
+    }
 
-	return maxRoom, nil
+    return maxRoom, nil
 }

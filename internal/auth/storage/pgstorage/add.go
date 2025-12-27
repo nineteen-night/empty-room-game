@@ -36,8 +36,8 @@ func (storage *PGstorage) CreatePartnership(ctx context.Context, user1ID, user2I
     partnershipID := uuid.New().String()
     
     query := squirrel.Insert(partnershipsTable).
-        Columns(partnershipIDColumn, user1IDColumn, user2IDColumn, statusColumn).
-        Values(partnershipID, user1ID, user2ID, "active").
+        Columns(partnershipIDColumn, user1IDColumn, user2IDColumn).
+        Values(partnershipID, user1ID, user2ID).
         PlaceholderFormat(squirrel.Dollar)
     
     queryText, args, err := query.ToSql()

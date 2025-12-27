@@ -25,7 +25,8 @@ func (s *PGStorage) GetGameSession(ctx context.Context, partnershipID string) (*
 	}
 
 	var session models.GameSession
-	err = s.db.QueryRow(ctx, queryText, args...).Scan(
+	db := s.getShard(partnershipID)
+	err = db.QueryRow(ctx, queryText, args...).Scan(
 		&session.PartnershipID,
 		&session.User1ID,
 		&session.User2ID,
@@ -43,78 +44,95 @@ func (s *PGStorage) GetGameSession(ctx context.Context, partnershipID string) (*
 }
 
 func (s *PGStorage) GetRoomByNumber(ctx context.Context, roomNumber int32) (*models.Room, error) {
-	query := squirrel.Select(
-		roomNumberColumn,
-		nameColumn,
-		descriptionColumn,
-	).
-		From(roomsTable).
-		Where(squirrel.Eq{roomNumberColumn: roomNumber}).
-		PlaceholderFormat(squirrel.Dollar)
+    s.mu.RLock()
+    db := s.shards[0]
+    s.mu.RUnlock()
+    
+    query := squirrel.Select(
+        roomNumberColumn,
+        nameColumn,
+        descriptionColumn,
+    ).
+        From(roomsTable).
+        Where(squirrel.Eq{roomNumberColumn: roomNumber}).
+        PlaceholderFormat(squirrel.Dollar)
 
-	queryText, args, err := query.ToSql()
-	if err != nil {
-		return nil, errors.Wrap(err, "generate query error")
-	}
+    queryText, args, err := query.ToSql()
+    if err != nil {
+        return nil, errors.Wrap(err, "generate query error")
+    }
 
-	var room models.Room
-	err = s.db.QueryRow(ctx, queryText, args...).Scan(
-		&room.RoomNumber,
-		&room.Name,
-		&room.Description,
-	)
+    var room models.Room
+    err = db.QueryRow(ctx, queryText, args...).Scan(
+        &room.RoomNumber,
+        &room.Name,
+        &room.Description,
+    )
 
-	if err != nil {
-		if err.Error() == "no rows in result set" {
-			return nil, nil
-		}
-		return nil, errors.Wrap(err, "query error")
-	}
+    if err != nil {
+        if err.Error() == "no rows in result set" {
+            return nil, nil
+        }
+        return nil, errors.Wrap(err, "query error")
+    }
 
-	return &room, nil
+    return &room, nil
 }
 
 func (s *PGStorage) GetGameSessionsByUserID(ctx context.Context, userID string) ([]*models.GameSession, error) {
-	query := squirrel.Select(
-		partnershipIDColumn,
-		user1IDColumn,
-		user2IDColumn,
-		currentRoomColumn,
-	).
-		From(gameSessionsTable).
-		Where(
-			squirrel.Or{
-				squirrel.Eq{user1IDColumn: userID},
-				squirrel.Eq{user2IDColumn: userID},
-			},
-		).
-		PlaceholderFormat(squirrel.Dollar)
+    
+    var allSessions []*models.GameSession
+    
+    s.mu.RLock()
+    shards := s.shards
+    s.mu.RUnlock()
 
-	queryText, args, err := query.ToSql()
-	if err != nil {
-		return nil, errors.Wrap(err, "generate query error")
-	}
+    for _, db := range shards {
+        if db == nil {
+            continue
+        }
+        
+        query := squirrel.Select(
+            partnershipIDColumn,
+            user1IDColumn,
+            user2IDColumn,
+            currentRoomColumn,
+        ).
+            From(gameSessionsTable).
+            Where(
+                squirrel.Or{
+                    squirrel.Eq{user1IDColumn: userID},
+                    squirrel.Eq{user2IDColumn: userID},
+                },
+            ).
+            PlaceholderFormat(squirrel.Dollar)
 
-	rows, err := s.db.Query(ctx, queryText, args...)
-	if err != nil {
-		return nil, errors.Wrap(err, "query error")
-	}
-	defer rows.Close()
+        queryText, args, err := query.ToSql()
+        if err != nil {
+            return nil, errors.Wrap(err, "generate query error")
+        }
 
-	var sessions []*models.GameSession
-	for rows.Next() {
-		var session models.GameSession
-		err := rows.Scan(
-			&session.PartnershipID,
-			&session.User1ID,
-			&session.User2ID,
-			&session.CurrentRoom,
-		)
-		if err != nil {
-			return nil, errors.Wrap(err, "scan error")
-		}
-		sessions = append(sessions, &session)
-	}
+        rows, err := db.Query(ctx, queryText, args...)
+        if err != nil {
+            continue
+        }
+        
+        for rows.Next() {
+            var session models.GameSession
+            err := rows.Scan(
+                &session.PartnershipID,
+                &session.User1ID,
+                &session.User2ID,
+                &session.CurrentRoom,
+            )
+            if err != nil {
+                rows.Close()
+                continue
+            }
+            allSessions = append(allSessions, &session)
+        }
+        rows.Close()
+    }
 
-	return sessions, nil
+    return allSessions, nil
 }

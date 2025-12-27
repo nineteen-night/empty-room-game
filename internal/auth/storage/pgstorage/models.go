@@ -12,7 +12,6 @@ type Partnership struct {
     ID       string `db:"id"`
     User1ID  string `db:"user1_id"`
     User2ID  string `db:"user2_id"`
-    Status   string `db:"status"`
 }
 
 const (
@@ -28,5 +27,4 @@ const (
     partnershipIDColumn = "id"
     user1IDColumn       = "user1_id"
     user2IDColumn       = "user2_id"
-    statusColumn        = "status"
 )

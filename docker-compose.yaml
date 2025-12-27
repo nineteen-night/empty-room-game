@@ -21,18 +21,38 @@ services:
       timeout: 5s
       retries: 5
 
-  # Game Service PostgreSQL
-  game-postgres:
+  # Game Service PostgreSQL Шард 0
+  game-postgres-shard-0:
     image: postgres:15-alpine
-    container_name: game-postgres
+    container_name: game-postgres-shard-0
     environment:
       POSTGRES_USER: game_user
       POSTGRES_PASSWORD: game_password
-      POSTGRES_DB: game_db
+      POSTGRES_DB: game_db_shard_0
     ports:
       - "5433:5432"
     volumes:
-      - game-postgres-data:/var/lib/postgresql/data
+      - game-postgres-shard-0-data:/var/lib/postgresql/data
+    networks:
+      - empty-room-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U game_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Game Service PostgreSQL Шард 1
+  game-postgres-shard-1:
+    image: postgres:15-alpine
+    container_name: game-postgres-shard-1
+    environment:
+      POSTGRES_USER: game_user
+      POSTGRES_PASSWORD: game_password
+      POSTGRES_DB: game_db_shard_1
+    ports:
+      - "5434:5432"
+    volumes:
+      - game-postgres-shard-1-data:/var/lib/postgresql/data
     networks:
       - empty-room-net
     healthcheck:
@@ -94,4 +114,5 @@ networks:
 
 volumes:
   auth-postgres-data:
-  game-postgres-data:
+  game-postgres-shard-0-data:
+  game-postgres-shard-1-data:
